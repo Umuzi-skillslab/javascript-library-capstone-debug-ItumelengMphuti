@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta
+      name="description"
+      content="A digital library management system for a local library."
+    />
+    <meta
+      name="keywords"
+      content="author, books, isbn"
+    />
+    <meta name="author" content="Itumeleng Mphuti" />
     <title>Library Management System</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/public/styles.css">
 </head>
 <body>
     <div class="container">
@@ -21,7 +30,7 @@
             <section id="catalogue-section">
                 <div class="controls">
                     <input type="text" id="search" placeholder="Search books...">
-                    <select id="filter-category">
+                    <select id="filter-category"> 
                         <option value="all">All Categories</option>
                         <option value="fiction">Fiction</option>
                         <option value="non-fiction">Non-Fiction</option>
@@ -77,9 +86,7 @@
         </main>
     </div>
     
-    <!-- Scripts in wrong order -->
-    <script src="ui.js"></script>
-    <script src="library.js"></script>
-    <!-- Missing: modules setup -->
+    <script src="../src/ui.js"></script>
+    <script src="../src/library.js"></script>
 </body>
 </html>
