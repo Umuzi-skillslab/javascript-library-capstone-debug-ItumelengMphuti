@@ -1,0 +1,124 @@
+{
+  "books": [
+    {
+      "isbn": "978-0-7432-7356-5",
+      "title": "Things Fall Apart",
+      "author": "Chinua Achebe",
+      "year": 1958,
+      "category": "fiction",
+      "copies": 4
+    },
+    {
+      "isbn": "978-0-7432-7357-2",
+      "title": "Americanah",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2013,
+      "category": "fiction",
+      "copies": 3
+    },
+    {
+      "isbn": "978-0-3856-6052-4",
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "year": 2011,
+      "category": "non-fiction",
+      "copies": 5
+    },
+    {
+      "isbn": "978-0-5957-4066-3",
+      "title": "Long Walk to Freedom",
+      "author": "Nelson Mandela",
+      "year": 1994,
+      "category": "non-fiction",
+      "copies": 4
+    },
+    {
+      "isbn": "978-0-1403-2349-8",
+      "title": "Half of a Yellow Sun",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2006,
+      "category": "fiction",
+      "copies": 3
+    },
+    {
+      "isbn": "978-0-6709-1068-9",
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "year": 1988,
+      "category": "fiction",
+      "copies": 6
+    },
+    {
+      "isbn": "978-0-1410-3943-3",
+      "title": "Educated",
+      "author": "Tara Westover",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 3
+    },
+    {
+      "isbn": "978-0-3853-3348-1",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 5
+    },
+    {
+      "isbn": "978-0-1412-8028-3",
+      "title": "Purple Hibiscus",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2003,
+      "category": "fiction",
+      "copies": 2
+    },
+    {
+      "isbn": "978-0-1930-3943-1",
+      "title": "Introduction to Algorithms",
+      "author": "Thomas H. Cormen",
+      "year": 2009,
+      "category": "reference",
+      "copies": 3
+    },
+    {
+      "isbn": "978-0-5960-0916-2",
+      "title": "The Kite Runner",
+      "author": "Khaled Hosseini",
+      "year": 2003,
+      "category": "fiction",
+      "copies": 4
+    },
+    {
+      "isbn": "978-0-3854-7378-4",
+      "title": "Thinking, Fast and Slow",
+      "author": "Daniel Kahneman",
+      "year": 2011,
+      "category": "non-fiction",
+      "copies": 3
+    },
+    {
+      "isbn": "978-0-1960-3943-7",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "year": 2008,
+      "category": "reference",
+      "copies": 4
+    },
+    {
+      "isbn": "978-0-7432-7358-9",
+      "title": "A Grain of Wheat",
+      "author": "Ngũgĩ wa Thiong'o",
+      "year": 1967,
+      "category": "fiction",
+      "copies": 2
+    },
+    {
+      "isbn": "978-0-2460-3943-5",
+      "title": "The Oxford Dictionary of Computing",
+      "author": "Andrew Butterfield",
+      "year": 2016,
+      "category": "reference",
+      "copies": 2
+    }
+  ]
+}

@@ -7,7 +7,7 @@ const LATE_FEE_PER_DAY = 0.50;
 const MAX_BOOKS_PER_MEMBER = 5;
 
 // Book class with multiple issues
-class Book {
+export class Book {
     constructor(isbn, title, author, year, copies) {
         this.isbn = isbn;
         this.title = title;
@@ -30,19 +30,27 @@ class Book {
     checkOut(memberId) {
         // No validation for available copies
         if(!this.isAvailable()) {
-            console.log(`Sorry, "${this.title}" has no available copies.`);
             return false;
         }
         this.availableCopies--;
         this.checkedOut.push(memberId);
-        console.log(`Member ${memberId} checked out "${this.title}". Copies left: ${this.availableCopies}`)
+        
+        return true;
+    }
+
+    returnBook(memberId) {
+        const index = this.checkOut.indexOf(memberId);
+
+        if(index === -1) {
+            return false;
+        }
+
+        this.checkOut.splice(index, 1);
+        this.availableCopies++;
         return true;
     }
 }
 
-const book = new Book(12533, "Things Fall Apart", "Chinua Achebe", 2013, 3);
-
-console.log(book)
 // Digital book class with inheritance problems
 // class DigitalBook extends Book {
 //     constructor(isbn, title, author, year, fileSize, format) {
