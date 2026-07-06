@@ -82,10 +82,10 @@ nav button:focus {
     color: white;
 }
 
-button[aria-selected="true"] {
+/* button[aria-selected="true"] {
     background: #2563eb;
     color: white;
-}
+} */
 
 /* ===========================
    SECTIONS

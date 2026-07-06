@@ -38,66 +38,104 @@ export class Book {
         return true;
     }
 
-    returnBook(memberId) {
-        const index = this.checkOut.indexOf(memberId);
+   returnBook(memberId) {
+    const index = this.checkedOut.indexOf(memberId);
 
-        if(index === -1) {
-            return false;
-        }
+    if (index === -1) {
+        return false;
+    }
 
-        this.checkOut.splice(index, 1);
-        this.availableCopies++;
+    this.checkedOut.splice(index, 1);
+    this.availableCopies++;
+
+    return true;
+}
+}
+
+// Digital book class with inheritance problems
+export class DigitalBook extends Book {
+    constructor(isbn, title, author, year, fileSize, format) {
+        // Missing: super() call with correct parameters
+        super(isbn, title, author, year, Infinity)
+        this.fileSize = fileSize;
+        this.format = format;
+        this.downloads = 0;
+        this.downloadHistory = [];
+    }
+    
+    download(memberId) {
+        this.downloads++;
+        this.downloadHistory.push(memberId);
         return true;
     }
 }
 
-// Digital book class with inheritance problems
-// class DigitalBook extends Book {
-//     constructor(isbn, title, author, year, fileSize, format) {
-//         // Missing: super() call with correct parameters
-//         this.fileSize = fileSize;
-//         this.format = format;
-//         this.downloads = 0;
-//     }
-    
-//     download(memberId) {
-//         // Should override differently than physical checkout
-//         this.downloads = this.downloads + 1;
-//     }
-// }
-
 // Member class with errors
-// class Member {
-//     constructor(id, name, email, membershipType) {
-//         this.id = id;
-//         this.name = name;
-//         this.email = email;
-//         this.membershipType = membershipType;
-//         this.borrowedBooks = [];
-//         // Missing: joinDate property
-//     }
-    
-//     // Missing: method to calculate membership duration
-//     // Missing: method using destructuring
-    
-//     canBorrow() {
-//         // Wrong comparison operator
-//         if (this.borrowedBooks.length = MAX_BOOKS_PER_MEMBER) {
-//             return false;
-//         }
-//         return true;
-//     }
-// }
+export class Member {
+    constructor(id, name, email, membershipType, joinDate) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.membershipType = membershipType;
+        this.borrowedBooks = [];
+        // Missing: joinDate property
+        this.joinDate = joinDate
+    }
+    // Missing: method to calculate membership duration
+    getMembershipDuration () {
+        const joined = new Date(this.joinDate);
+        const today = new Date();
+
+        if(joined > today) {
+            throw new Error("Member has not joined yet.");
+        };
+
+        // Milliseconds difference
+        const diffMs = today - joined;
+        const diffDate = new Date(diffMs);
+        
+        const year = diffDate.getUTCFullYear() - 1970;
+        const month = diffDate.getUTCMonth();
+        const days = diffDate.getDate() - 1;
+
+        const yearLabel = year === 1 ? "year" : "years";
+        const monthLabel = month === 1 ? "month" : "months";
+        const dayLabel = days === 1 ? "day" : "days";
+
+        if (year > 0) {
+            return `Member has been active for ${year} ${yearLabel}, ${month} ${monthLabel} and ${days} ${dayLabel}.`;
+        } else if 
+            (month > 0) {
+                return `Member has been active for ${month} ${monthLabel} and ${days} ${dayLabel}.`;
+        } else {
+            return `Member has been active for ${days} ${dayLabel}.`;
+        }
+    }
+    // Missing: method using destructuring
+    getMemberInfo() {
+        const { id, name, email, membershipType } = this;
+
+        return `${name} (${id}) - ${membershipType} member | ${email}`;
+    }
+
+    canBorrow() {
+        // Wrong comparison operator
+        if (this.borrowedBooks.length >= MAX_BOOKS_PER_MEMBER) {
+            return false;
+        }
+        return true;
+    }
+}
 
 // // Premium member with inheritance issues
-// class PremiumMember extends Member {
-//     constructor(id, name, email) {
-//         super(id, name, email, "premium");
-//         // Missing: additional premium benefits properties
-//     }
+class PremiumMember extends Member {
+    constructor(id, name, email) {
+        super(id, name, email, "premium");
+        // Missing: additional premium benefits properties
+    }
     
-//     // Should override canBorrow to allow more books
-// }
+    // Should override canBorrow to allow more books
+}
 
 // // Complex function with nested loops and errors
 // function findOverdueBooks(daysOverdue) {

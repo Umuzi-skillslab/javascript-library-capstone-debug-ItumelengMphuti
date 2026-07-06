@@ -1,4 +1,6 @@
-import { Book } from '../src/library.js';
+import { jest } from '@jest/globals'
+
+import { Book, DigitalBook, Member } from '../src/library.js';
 
 describe('Book Class', () => {
     test("should create a book instance with the correct properties ", () => {
@@ -44,40 +46,160 @@ describe('Book Class', () => {
         book.checkOut("001");
         book.checkOut("002");
 
-        // expect(result).toBe(true);
         expect(book.availableCopies).toBe(1);
         expect(book.checkedOut).toEqual(["001", "002"]);
     });
-    //Checkout unavailable book
 
-    test("should return book successfully", () => {
-        const book = new Book("978-0-3856-6052-4", "Fake Book", "John Doe", 2002, 2);
+    test("should not allow checkout when no copies are available", () => {
+        const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 1);
+        book.checkOut("001");
+        const result = book.checkOut("002");
+
+        expect(result).toBe(false);
+        expect(book.availableCopies).toBe(0);
+        expect(book.checkedOut).toEqual(["001"]);
+    });
+    test("should return a checked out book", () => {
+        const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 2);
+
+        book.checkOut("001");
 
         const result = book.returnBook("001");
 
         expect(result).toBe(true);
         expect(book.availableCopies).toBe(2);
-        expect(book.checkOut).toEqual([]);
+        expect(book.checkedOut).toEqual([]);
     });
+    test("should return false if member did not borrow the book", () => {
+        const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 2);
+
+        expect(book.returnBook("001")).toBe(false);
+    })
 });
 
 describe('DigitalBook Class', () => {
     // Missing: test for inheritance
+    test("should inherit from Book class", () => {
+        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+        expect(ebook instanceof DigitalBook).toBe(true);
+        expect(ebook instanceof Book).toBe(true);
+    });
     // Missing: test for super() call
+    test("should call the Book constructor using super()", () => {
+        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+        expect(ebook.isbn).toBe("978-0-7432-7357-2");
+        expect(ebook.title).toBe("Book");
+        expect(ebook.author).toBe("Jane Doe");
+        expect(ebook.year).toBe(2024);
+        expect(ebook.fileSize).toBe("5MB");
+        expect(ebook.format).toBe("PDF");
+    });
+    test("should initialize DigitalBook properties", () => {
+        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+        expect(ebook.fileSize).toBe("5MB");
+        expect(ebook.format).toBe("PDF");
+        expect(ebook.downloads).toBe(0);
+        expect(ebook.downloadHistory).toEqual([]);
+    });
     // Missing: test for download method
+    test("should download a digital book", () => {
+        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+
+        const result = ebook.download("002")
+        expect(result).toBe(true);
+        expect(ebook.downloads).toBe(1);
+        expect(ebook.downloadHistory).toEqual(["002"]);
+    });
 });
 
 describe('Member Class', () => {
-    test('canBorrow returns boolean', () => {
-        var member = new Member(1, 'John Doe', 'john@example.com', 'standard');
-        var result = member.canBorrow();
-
-        // Wrong assertion type
-        expect(typeof result).toBe('boolean');
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date("2026-07-06"));
+    });
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
-    // Missing: test for borrow limit
-    // Missing: test for membership duration calculation
+    test("should create a member with correct details", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2026-07-01");
+
+        expect(member.id).toBe(1);
+        expect(member.name).toBe("John Doe");
+        expect(member.email).toBe("johndoe@email.com");
+        expect(member.membershipType).toBe("standard");
+        expect(member.borrowedBooks).toEqual([]);
+        expect(member.joinDate).toBe("2026-07-01");
+    });
+    test("should return the correct membership duration in days", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2026-07-01");
+        expect(member.getMembershipDuration()).toBe("Member has been active for 5 days.");
+
+    });
+    test("should return the correct membership duration in months and days", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2026-02-01");
+        expect(member.getMembershipDuration()).toBe("Member has been active for 5 months and 4 days.");
+
+    });
+    test("should return the correct membership duration in years", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2024-06-01");
+        expect(member.getMembershipDuration()).toBe("Member has been active for 2 years, 1 month and 4 days.");
+
+    });
+    test("should return an error message for a future join date", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2026-07-07");
+
+        expect(() => member.getMembershipDuration())
+            .toThrow("Member has not joined yet.");
+    });
+
+    test("should get correct member information", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard");
+        expect(member.getMemberInfo()).toBe("John Doe (1) - standard member | johndoe@email.com");
+    });
+
+    test("should return true if a member can borrow a book", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard");
+        const result = member.canBorrow();
+        expect(result).toBe(true);
+    });
+    test("should return false when member has borrowed 5 books", () => {
+        const member = new Member(
+            1,
+            "John Doe",
+            "johndoe@email.com",
+            "standard"
+        );
+
+        member.borrowedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5"
+        ];
+
+        expect(member.canBorrow()).toBe(false);
+    });
+    test("should return false when member has more than 5 borrowed books", () => {
+        const member = new Member(
+            1,
+            "John Doe",
+            "johndoe@email.com",
+            "standard"
+        );
+
+        member.borrowedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5",
+            "ISBN6"
+        ];
+
+        expect(member.canBorrow()).toBe(false);
+    });
 });
 
 describe('PremiumMember Class', () => {
