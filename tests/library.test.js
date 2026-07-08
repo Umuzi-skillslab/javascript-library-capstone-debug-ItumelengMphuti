@@ -1,6 +1,6 @@
-import { jest } from '@jest/globals'
+import { expect, jest } from '@jest/globals'
 
-import { Book, DigitalBook, Member } from '../src/library.js';
+import { Book, DigitalBook, Member, PremiumMember } from '../src/library.js';
 
 describe('Book Class', () => {
     test("should create a book instance with the correct properties ", () => {
@@ -160,7 +160,7 @@ describe('Member Class', () => {
 
     test("should return true if a member can borrow a book", () => {
         const member = new Member(1, "John Doe", "johndoe@email.com", "standard");
-        const result = member.canBorrow();
+        const result = member.canBorrowBook();
         expect(result).toBe(true);
     });
     test("should return false when member has borrowed 5 books", () => {
@@ -179,7 +179,7 @@ describe('Member Class', () => {
             "ISBN5"
         ];
 
-        expect(member.canBorrow()).toBe(false);
+        expect(member.canBorrowBook()).toBe(false);
     });
     test("should return false when member has more than 5 borrowed books", () => {
         const member = new Member(
@@ -198,14 +198,138 @@ describe('Member Class', () => {
             "ISBN6"
         ];
 
-        expect(member.canBorrow()).toBe(false);
+        expect(member.canBorrowBook()).toBe(false);
+    });
+
+    test("should return true if a member can download an ebook", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard");
+
+        const result = member.canBorrowEbook();
+        expect(result).toBe(true);
+    });
+
+    test("should return false when a member downloaded 5 books", () => {
+        const member = new Member(1, "John Doe", "johndoe@email.com", "standard", "2026-07-01");
+        member.downloadedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5"
+        ];
+        expect(member.canBorrowEbook()).toBe(false);
     });
 });
 
 describe('PremiumMember Class', () => {
-    // Missing: all tests for premium member
     // Missing: test for inheritance
-    // Missing: test for overridden methods
+    test("should inherit from Member class", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "2026-07-01");
+        expect(premiumMember instanceof PremiumMember).toBe(true);
+        expect(premiumMember instanceof Member).toBe(true);
+    });
+    test("show override the canBorrowBook method", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
+
+        const result = premiumMember.canBorrowBook();
+        expect(result).toBe(true);
+    });
+    test("should allow premium member to borrow more than 5 books", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
+
+        premiumMember.borrowedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5",
+            "ISBN6",
+            "ISBN6"
+        ];
+        expect(premiumMember.canBorrowBook()).toBe(true);
+    });
+    test("should return false when premium member borrows 10 books", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
+
+        premiumMember.borrowedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5",
+            "ISBN6",
+            "ISBN7",
+            "ISBN8",
+            "ISBN9",
+            "ISBN10"
+        ];
+        expect(premiumMember.canBorrowBook()).toBe(false);
+    });
+    test("should override the canBorrowEbook method", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
+
+        const result = premiumMember.canBorrowEbook();
+        expect(result).toBe(true);
+    });
+    test("should allow a premium member to download more than the standard limit", () => {
+        const premiumMember = new PremiumMember(
+            1,
+            "John Doe",
+            "johndoe@email.com",
+            "2026-07-01"
+        );
+
+        premiumMember.downloadedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5",
+            "ISBN6",
+            "ISBN7",
+            "ISBN8",
+            "ISBN9",
+            "ISBN10"
+        ];
+
+        expect(premiumMember.canBorrowEbook()).toBe(true);
+    });
+    test("should not allow a premium member to download more than 15 ebooks", () => {
+        const premiumMember = new PremiumMember(
+            1,
+            "John Doe",
+            "johndoe@email.com",
+            "2026-07-01"
+        );
+
+        premiumMember.downloadedBooks = [
+            "ISBN1",
+            "ISBN2",
+            "ISBN3",
+            "ISBN4",
+            "ISBN5",
+            "ISBN6",
+            "ISBN7",
+            "ISBN8",
+            "ISBN9",
+            "ISBN10",
+            "ISBN11",
+            "ISBN12",
+            "ISBN13",
+            "ISBN14",
+            "ISBN15"
+        ];
+
+        expect(premiumMember.canBorrowEbook()).toBe(false);
+    });
+
+    test("should waiver late fees for premium members", () => {
+        const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "2026-07-01");
+
+        expect(premiumMember.calculateTotalLateFees(0)).toBe(0);
+        expect(premiumMember.calculateTotalLateFees(5)).toBe(0);
+        expect(premiumMember.calculateTotalLateFees(100)).toBe(0);
+    });
 });
 
 describe('Library Functions', () => {
