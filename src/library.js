@@ -17,6 +17,7 @@ export class Book {
         this.availableCopies = copies;
         this.totalCopies = copies;
         this.checkedOut = [];
+        this.reservationQueue = [];
     }
     // Missing: method to check availability
     isAvailable() {
@@ -34,13 +35,26 @@ export class Book {
             return false;
         }
         this.availableCopies--;
-        this.checkedOut.push(memberId);
+        this.checkedOut.push({ memberId, checkoutDate: new Date() });
 
         return true;
     }
 
+    reserveBook(memberId) {
+        if (this.availableCopies > 0) {
+            return false;
+        }
+        if(this.reservationQueue.includes(memberId)) {
+            return false;
+        }
+        this.reservationQueue.push(memberId);
+        return true;
+    }
+
     returnBook(memberId) {
-        const index = this.checkedOut.indexOf(memberId);
+        const index = this.checkedOut.findIndex(
+            record => record.memberId === memberId
+        );
 
         if (index === -1) {
             return false;
@@ -49,8 +63,14 @@ export class Book {
         this.checkedOut.splice(index, 1);
         this.availableCopies++;
 
+        if(this.reservationQueue.length > 0) {
+            const nextMember = this.reservationQueue.shift();
+            this.checkOut(nextMember);
+        }
         return true;
     }
+
+
 }
 
 // Digital book class with inheritance problems
@@ -120,7 +140,7 @@ export class Member {
         return `${name} (${id}) - ${membershipType} member | ${email}`;
     }
 
-    canBorrowBook() {
+    canBorrow() {
         // Wrong comparison operator
         if (this.borrowedBooks.length >= MAX_BOOKS_PER_MEMBER) {
             return false;
@@ -133,17 +153,19 @@ export class Member {
         }
         return true;
     }
+    canReserve() {
+        return false;
+    }
 }
 
 // Premium member with inheritance issues
 export class PremiumMember extends Member {
     constructor(id, name, email, joinDate) {
         super(id, name, email, "premium", joinDate);
-        // Missing: additional premium benefits properties
     }
 
     // Should override canBorrow to allow more books
-    canBorrowBook() {
+    canBorrow() {
         return this.borrowedBooks.length < 10;
     }
     //No late fee for premium
@@ -154,38 +176,62 @@ export class PremiumMember extends Member {
     canBorrowEbook() {
         return this.downloadedBooks.length < 15;
     }
+
+    canReserve() {
+        return true;
+    }
 }
 
 // Complex function with nested loops and errors
 function findOverdueBooks(daysOverdue) {
-    var overdue = [];
+    let overdue = [];
 
-    // Inefficient nested loops - should be optimized
-    for (var i = 0; i < books.length; i++) {
-        for (var j = 0; j < books[i].checkedOut.length; j++) {
+    for (let i = 0; i < books.length; i++) {
+        for (let j = 0; j < books[i].checkedOut.length; j++) {
             // Missing: actual date checking logic
-            // Wrong variable scoping
-            var checkoutRecord = books[i].checkedOut[j];
-            overdue.push(checkoutRecord);
+            const checkoutRecord = books[i].checkedOut[j];
+            const dateCheckedOut = new Date(checkoutRecord.checkoutDate);
+            const today = new Date();
+
+            const diffMs = today - dateCheckedOut;
+            const daysBorrowed = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (daysBorrowed >= daysOverdue) {
+                const overdueBook = {
+                    isbn: books[i].isbn,
+                    title: books[i].title,
+                    memberId: checkoutRecord.memberId,
+                    checkoutDate: checkoutRecord.checkoutDate
+                };
+                overdue.push(overdueBook)
+            }
         }
     }
 
     return overdue;
 }
 
-// Function with while loop error
+// Processes Books being returned
 function processReturnQueue(queue) {
-    var index = 0;
+    const results = [];
 
-    // Infinite loop potential
-    while (index < queue.length) {
-        var item = queue[index];
+    while (queue.length > 0) {
+        const { book, memberId } = queue.shift();
 
-        // Process item
-        console.log("Processing return: " + item);
+        const success = book.returnBook(memberId);
 
-        // Missing: index increment
+        if (success) {
+            results.push(
+                `Processed return: "${book.title}" from member ${memberId}`
+            );
+        } else {
+            results.push(
+                `Return failed: member ${memberId} had no record for "${book.title}"`
+            );
+        }
     }
+
+    return results;
 }
 
 // Recursive function with multiple errors

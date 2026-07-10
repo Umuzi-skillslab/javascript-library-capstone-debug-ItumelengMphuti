@@ -3,6 +3,13 @@ import { expect, jest } from '@jest/globals'
 import { Book, DigitalBook, Member, PremiumMember } from '../src/library.js';
 
 describe('Book Class', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date("2026-07-06"));
+    });
+    afterEach(() => {
+        jest.useRealTimers();
+    });
     test("should create a book instance with the correct properties ", () => {
         const book = new Book(
             "978-0-7432-7356-5",
@@ -37,28 +44,92 @@ describe('Book Class', () => {
 
         const result = book.checkOut("001");
 
-        expect(result).toBe(true);
-        expect(book.availableCopies).toBe(1);
-        expect(book.checkedOut).toContain("001");
+        expect(book.checkedOut).toHaveLength(1);
+        expect(book.checkedOut[0].memberId).toBe("001");
+        expect(book.checkedOut[0].checkoutDate).toEqual(new Date("2026-07-06"));
     });
     test("should allow multpiple members to checkout copies", () => {
         const book = new Book("978-0-3856-6052-4", "Fake Book", "John Doe", 2009, 3);
         book.checkOut("001");
-        book.checkOut("002");
+        book.checkOut("002"
 
-        expect(book.availableCopies).toBe(1);
-        expect(book.checkedOut).toEqual(["001", "002"]);
+        );
+        expect(book.checkedOut).toHaveLength(2);
+
+        expect(book.checkedOut[0].memberId).toBe("001");
+        expect(book.checkedOut[1].memberId).toBe("002");
+
+        expect(book.checkedOut[0].checkoutDate).toEqual(
+            new Date("2026-07-06")
+        );
+        expect(book.checkedOut[1].checkoutDate).toEqual(
+            new Date("2026-07-06")
+        );
     });
 
     test("should not allow checkout when no copies are available", () => {
         const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 1);
         book.checkOut("001");
         const result = book.checkOut("002");
+        expect(book.checkedOut).toHaveLength(1);
+        expect(book.checkedOut[0].memberId).toBe("001");
+        expect(book.checkedOut[0].checkoutDate).toEqual(new Date("2026-07-06"));
+    });
+
+    test("should allow a book to be reserved", () => {
+        const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 0);
+        const result = book.reserveBook("002");
+
+        expect(result).toBe(true);
+        expect(book.reservationQueue).toHaveLength(1);
+        expect(book.reservationQueue[0]).toBe("002");
+    });
+
+    test("should allow a member to reserve a book with no available copies", () => {
+        const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 0);
+        const result = book.reserveBook("002");
+
+        expect(result).toBe(true);
+        expect(book.reservationQueue).toHaveLength(1);
+        expect(book.reservationQueue[0]).toBe("002");
+    });
+
+    test("should add multiple members to the reservation queue", () => {
+        const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 0);
+
+        book.reserveBook("002");
+        book.reserveBook("003");
+        book.reserveBook("004");
+
+        expect(book.reservationQueue).toHaveLength(3);
+        expect(book.reservationQueue).toEqual(["002", "003", "004"]);
+    });
+
+    test("should not allow reservation when copies are available", () => {
+        const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 2);
+
+        const result = book.reserveBook("002");
 
         expect(result).toBe(false);
-        expect(book.availableCopies).toBe(0);
-        expect(book.checkedOut).toEqual(["001"]);
+        expect(book.reservationQueue).toHaveLength(0);
     });
+
+    test("should assign the book to the first reserved member when returned", () => {
+        const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 1);
+
+        book.checkOut("001");
+
+        book.reserveBook("002");
+        book.reserveBook("003");
+
+        book.returnBook("001");
+
+        expect(book.checkedOut).toHaveLength(1);
+        expect(book.checkedOut[0].memberId).toBe("002");
+        expect(book.reservationQueue).toEqual(["003"]);
+        expect(book.availableCopies).toBe(0);
+    });
+
     test("should return a checked out book", () => {
         const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 2);
 
@@ -68,7 +139,7 @@ describe('Book Class', () => {
 
         expect(result).toBe(true);
         expect(book.availableCopies).toBe(2);
-        expect(book.checkedOut).toEqual([]);
+        expect(book.checkedOut).toHaveLength(0);
     });
     test("should return false if member did not borrow the book", () => {
         const book = new Book("978-0-7432-7357-2", "Fake Book", "John Doe", 2006, 2);
@@ -160,7 +231,7 @@ describe('Member Class', () => {
 
     test("should return true if a member can borrow a book", () => {
         const member = new Member(1, "John Doe", "johndoe@email.com", "standard");
-        const result = member.canBorrowBook();
+        const result = member.canBorrow();
         expect(result).toBe(true);
     });
     test("should return false when member has borrowed 5 books", () => {
@@ -179,7 +250,7 @@ describe('Member Class', () => {
             "ISBN5"
         ];
 
-        expect(member.canBorrowBook()).toBe(false);
+        expect(member.canBorrow()).toBe(false);
     });
     test("should return false when member has more than 5 borrowed books", () => {
         const member = new Member(
@@ -198,7 +269,7 @@ describe('Member Class', () => {
             "ISBN6"
         ];
 
-        expect(member.canBorrowBook()).toBe(false);
+        expect(member.canBorrow()).toBe(false);
     });
 
     test("should return true if a member can download an ebook", () => {
@@ -231,7 +302,7 @@ describe('PremiumMember Class', () => {
     test("show override the canBorrowBook method", () => {
         const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
 
-        const result = premiumMember.canBorrowBook();
+        const result = premiumMember.canBorrow();
         expect(result).toBe(true);
     });
     test("should allow premium member to borrow more than 5 books", () => {
@@ -246,7 +317,7 @@ describe('PremiumMember Class', () => {
             "ISBN6",
             "ISBN6"
         ];
-        expect(premiumMember.canBorrowBook()).toBe(true);
+        expect(premiumMember.canBorrow()).toBe(true);
     });
     test("should return false when premium member borrows 10 books", () => {
         const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
@@ -263,7 +334,7 @@ describe('PremiumMember Class', () => {
             "ISBN9",
             "ISBN10"
         ];
-        expect(premiumMember.canBorrowBook()).toBe(false);
+        expect(premiumMember.canBorrow()).toBe(false);
     });
     test("should override the canBorrowEbook method", () => {
         const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
@@ -334,11 +405,9 @@ describe('PremiumMember Class', () => {
 
 describe('Library Functions', () => {
     // Missing: beforeEach to initialize test data
-
     test('findBookByISBN returns book', () => {
         // Test data not set up properly
         var book = findBookByISBN('978-0-123');
-
         // Will fail - no books in array
         expect(book).toBeDefined();
     });
