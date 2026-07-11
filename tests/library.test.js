@@ -1,6 +1,27 @@
-import { expect, jest } from '@jest/globals'
+import { beforeEach, expect, jest } from '@jest/globals'
 
-import { Book, DigitalBook, Member, PremiumMember } from '../src/library.js';
+import {
+    books,
+    members,
+    Book,
+    DigitalBook,
+    Member,
+    PremiumMember,
+    findOverdueBooks,
+    processReturnQueue,
+    searchBooksByCategory,
+    getBooksByAuthor,
+    calculateTotalLateFees,
+    combineBookCollections,
+    addMultipleBooks,
+    updateMemberInfo,
+    borrowBook,
+    findMemberById,
+    findBookByISBN,
+    LibraryStats,
+    formatBookInfo,
+    calculateFineAmount
+} from "../src/library.js";
 
 describe('Book Class', () => {
     beforeEach(() => {
@@ -27,18 +48,22 @@ describe('Book Class', () => {
         expect(book.checkedOut).toEqual([]);
 
     });
+
     test("should return true when copies are available", () => {
         const book = new Book("978-0-7432-7356-5", "Test Book", "John Doe", 2009, 4);
         expect(book.isAvailable()).toBe(true)
     });
+
     test("should return false when copies are not available", () => {
         const book = new Book("978-0-7432-7356-5", "Test Book", "John Doe", 2009, 0);
         expect(book.isAvailable()).toBe(false)
     });
+
     test("should return book infomation", () => {
         const book = new Book("978-0-7432-7356-5", "Fake Book", "John Doe", 2002, 3);
         expect(book.getInfo()).toBe('"Fake Book" by John Doe (2002) - ISBN: 978-0-7432-7356-5 | Available: 3/3')
     });
+
     test("should check out a book successfully", () => {
         const book = new Book("978-0-3856-6052-4", "Book", "Author", 2024, 2);
 
@@ -48,6 +73,7 @@ describe('Book Class', () => {
         expect(book.checkedOut[0].memberId).toBe("001");
         expect(book.checkedOut[0].checkoutDate).toEqual(new Date("2026-07-06"));
     });
+
     test("should allow multpiple members to checkout copies", () => {
         const book = new Book("978-0-3856-6052-4", "Fake Book", "John Doe", 2009, 3);
         book.checkOut("001");
@@ -84,6 +110,31 @@ describe('Book Class', () => {
         expect(book.reservationQueue).toHaveLength(1);
         expect(book.reservationQueue[0]).toBe("002");
     });
+
+    test("standard members cannot reserve books", () => {
+        const member = new Member(
+            "001",
+            "John",
+            "john@email.com",
+            "standard"
+        );
+
+        expect(member.canReserve()).toBe(false);
+    });
+
+    test("should not reserve the same book twice", () => {
+    const book = new Book(
+        "ISBN1",
+        "Book",
+        "Author",
+        2020,
+        0
+    );
+
+    book.reserveBook("001");
+
+    expect(book.reserveBook("001")).toBe(false);
+});
 
     test("should allow a member to reserve a book with no available copies", () => {
         const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 0);
@@ -336,6 +387,17 @@ describe('PremiumMember Class', () => {
         ];
         expect(premiumMember.canBorrow()).toBe(false);
     });
+
+    test("premium members can reserve books", () => {
+        const member = new PremiumMember(
+            "001",
+            "Jane",
+            "jane@email.com"
+        );
+
+        expect(member.canReserve()).toBe(true);
+    });
+
     test("should override the canBorrowEbook method", () => {
         const premiumMember = new PremiumMember(1, "John Doe", "johndoe@email.com", "premium", "2026-07-01");
 
@@ -405,55 +467,264 @@ describe('PremiumMember Class', () => {
 
 describe('Library Functions', () => {
     // Missing: beforeEach to initialize test data
-    test('findBookByISBN returns book', () => {
-        // Test data not set up properly
-        var book = findBookByISBN('978-0-123');
-        // Will fail - no books in array
-        expect(book).toBeDefined();
+    beforeEach(() => {
+        books.length = 0;
+        members.length = 0;
+
+        books.push(
+            new Book("978-0-123", "Things Fall Apart", "Chinua Achebe", 1958, 3),
+            new Book("978-0-456", "Americanah", "Chimamanda Ngozi Adichie", 2013, 2),
+            new Book("978-0-789", "No Longer at Ease", "Chinua Achebe", 1960, 4)
+        );
+        members.push(
+            new Member("001", "John", "john@email.com", "standard"),
+            new PremiumMember("002", "Jane", "jane@email.com")
+        );
     });
 
-    // Missing: test for getBooksByAuthor
-    // Missing: test with empty arrays
-    // Missing: test with null/undefined inputs
-});
+    test("findBookByISBN returns book", () => {
+        const book = findBookByISBN("978-0-123");
 
-describe('Array Operations', () => {
-    // Missing: tests for filter operations
-    // Missing: tests for map operations
-    // Missing: tests for reduce operations
-    // Missing: tests for spread operator
-    // Missing: tests for rest parameters
-});
-
-describe('Recursive Functions', () => {
-    // Missing: test for searchBooksByCategory
-    // Missing: test for base case
-    // Missing: test for stack overflow prevention
-});
-
-describe('Error Handling', () => {
-    // Missing: tests for try-catch blocks
-    // Missing: tests for undefined/null handling
-    // Missing: tests for type checking
-});
-
-describe('String Operations', () => {
-    // Missing: tests for formatBookInfo
-    // Missing: tests for template literals
-    // Missing: tests for string methods
-});
-
-describe('Math Operations', () => {
-    test('calculateFineAmount returns number', () => {
-        var fine = calculateFineAmount(5);
-
-        expect(typeof fine).toBe('number');
-        // Missing: test for correct calculation
-        // Missing: test for toFixed/rounding
+        expect(book).not.toBeNull();
+        expect(book.title).toBe("Things Fall Apart");
     });
 
-    // Missing: test for NaN handling
-    // Missing: test for negative numbers
+    test("should return null when ISBN is not found", () => {
+        expect(findBookByISBN("ISBN999")).toBeNull();
+    });
+
+    test("should return all books by an author", () => {
+        const result = getBooksByAuthor("Chinua Achebe");
+
+        expect(result).toHaveLength(2);
+    });
+
+    test("should return an empty array when author has no books", () => {
+        expect(getBooksByAuthor("J.K. Rowling")).toEqual([]);
+    });
+});
+
+describe("Array Operations", () => {
+
+    test("should calculate total late fees using reduce", () => {
+
+        const memberRecord = {
+            overdueBooks: [
+                { daysLate: 2 },
+                { daysLate: 3 }
+            ]
+        };
+
+        expect(calculateTotalLateFees(memberRecord)).toBe(2.5);
+    });
+
+    test("should combine book collections using spread", () => {
+
+        const fiction = ["Book 1"];
+        const nonFiction = ["Book 2"];
+        const reference = ["Book 3"];
+
+        expect(
+            combineBookCollections(fiction, nonFiction, reference)
+        ).toEqual(["Book 1", "Book 2", "Book 3"]);
+
+    });
+
+    test("should add multiple books using rest parameters", () => {
+
+        books.length = 0;
+
+        const book1 = new Book("ISBN1", "Book 1", "Author", 2020, 2);
+        const book2 = new Book("ISBN2", "Book 2", "Author", 2021, 2);
+
+        addMultipleBooks(book1, book2);
+
+        expect(books).toHaveLength(2);
+
+    });
+
+});
+
+describe("Recursive Functions", () => {
+
+    const library = [
+        {
+            title: "Book 1",
+            category: "fiction"
+        },
+        {
+            title: "Book 2",
+            category: "reference"
+        },
+        {
+            title: "Book 3",
+            category: "fiction"
+        }
+    ];
+
+    test("should return books in the selected category", () => {
+
+        const result = searchBooksByCategory(library, "fiction");
+
+        expect(result).toHaveLength(2);
+
+    });
+
+    test("should return an empty array for an empty book list", () => {
+
+        expect(
+            searchBooksByCategory([], "fiction")
+        ).toEqual([]);
+
+    });
+
+    test("should return an empty array for null input", () => {
+
+        expect(
+            searchBooksByCategory(null, "fiction")
+        ).toEqual([]);
+
+    });
+
+});
+
+describe("Error Handling", () => {
+
+    test("should return false for null memberId", () => {
+        expect(borrowBook(null, "ISBN1")).toBe(false);
+    });
+
+    test("should return false for null ISBN", () => {
+        expect(borrowBook("001", null)).toBe(false);
+    });
+
+    test("should return null for invalid fine input", () => {
+        expect(calculateFineAmount("five")).toBeNull();
+    });
+
+    test("should return null for NaN", () => {
+        expect(calculateFineAmount(NaN)).toBeNull();
+    });
+
+});
+
+describe("String Operations", () => {
+
+    test("should format book information correctly", () => {
+
+        const book = new Book(
+            "ISBN1",
+            "  Things Fall Apart  ",
+            " Chinua Achebe ",
+            1958,
+            3
+        );
+
+        const result = formatBookInfo(book);
+
+        expect(result).toContain("THINGS FALL APART");
+        expect(result).toContain("Chinua Achebe");
+        expect(result).toContain("1958");
+
+    });
+
+});
+
+describe("Math Operations", () => {
+
+    test("should calculate the correct fine amount", () => {
+        expect(calculateFineAmount(5)).toBe("2.50");
+    });
+
+    test("should return a string formatted to two decimal places", () => {
+        expect(typeof calculateFineAmount(5)).toBe("string");
+    });
+
+    test("should return null for NaN", () => {
+        expect(calculateFineAmount(NaN)).toBeNull();
+    });
+
+    test("should return null for null", () => {
+        expect(calculateFineAmount(null)).toBeNull();
+    });
+
+    test("should return null for undefined", () => {
+        expect(calculateFineAmount(undefined)).toBeNull();
+    });
+
+    test("should return null for invalid type", () => {
+        expect(calculateFineAmount("5")).toBeNull();
+    });
+
+    test("should calculate a negative fine", () => {
+        expect(calculateFineAmount(-2)).toBe("-1.00");
+    });
+});
+
+describe("LibraryStats", () => {
+    beforeEach(() => {
+        books.length = 0;
+        members.length = 0;
+
+        const book1 = new Book("ISBN1", "Book One", "Author A", 2020, 3);
+        const book2 = new Book("ISBN2", "Book Two", "Author B", 2021, 2);
+
+        // Use the actual method
+        book1.checkOut("001");
+        book2.checkOut("001");
+        book2.checkOut("002");
+
+        books.push(book1, book2);
+
+        members.push(
+            new Member("001", "John", "john@email.com", "standard"),
+            new Member("002", "Jane", "jane@email.com", "premium")
+        );
+
+        LibraryStats.updateStats();
+    });
+
+    test("should update library statistics", () => {
+        expect(LibraryStats.totalBooks).toBe(2);
+        expect(LibraryStats.totalMembers).toBe(2);
+        expect(LibraryStats.totalBorrowings).toBe(3);
+    });
+
+    test("should calculate average borrowings per member", () => {
+        expect(LibraryStats.getAverageBorrowings()).toBe(2);
+    });
+
+    test("should return 0 when there are no members", () => {
+        members.length = 0;
+
+        LibraryStats.updateStats();
+
+        expect(LibraryStats.getAverageBorrowings()).toBe(0);
+    });
+
+    test("should count available books", () => {
+        expect(LibraryStats.countAvailableBooks()).toBe(2);
+    }); // Failing
+
+    test("should return a statistics object", () => {
+        expect(LibraryStats.getStatistics()).toEqual({
+            totalBooks: 2,
+            totalMembers: 2,
+            totalBorrowings: 3
+        });
+    });
+
+    test("should return the most popular book", () => {
+        const result = LibraryStats.getMostPopularBook();
+
+        expect(result.title).toBe("Book Two");
+    });
+
+    test("should return null when there are no books", () => {
+        books.length = 0;
+
+        expect(LibraryStats.getMostPopularBook()).toBeNull();
+    });
 });
 
 describe('DOM Manipulation', () => {
