@@ -4,6 +4,8 @@
  */
 import { beforeEach, describe, expect, jest } from '@jest/globals'
 
+import { showMessage } from "../src/utils.js";
+
 import {
     books,
     members,
@@ -28,6 +30,7 @@ import {
 } from "../src/library.js";
 
 import {
+    initializeUI,
     renderBookCatalogue,
     handleSearch,
     displayBookDetails,
@@ -36,10 +39,16 @@ import {
     updateStatisticsDisplay,
     createMemberForm,
     exportLibraryData,
+    handleBookClick,
+    setupEventListeners,
+    renderMemberList,
+    loadCatalogue,
     importLibraryData,
     saveToLocalStorage,
     loadFromLocalStorage
 } from "../src/ui.js";
+
+
 
 describe('Book Class', () => {
     beforeEach(() => {
@@ -226,7 +235,15 @@ describe('DigitalBook Class', () => {
     });
     // Missing: test for super() call
     test("should call the Book constructor using super()", () => {
-        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+        const ebook = new DigitalBook(
+            "978-0-7432-7357-2",
+            "Book",
+            "Jane Doe",
+            2024,
+            "reference",
+            "5MB",
+            "PDF"
+        );
         expect(ebook.isbn).toBe("978-0-7432-7357-2");
         expect(ebook.title).toBe("Book");
         expect(ebook.author).toBe("Jane Doe");
@@ -235,7 +252,15 @@ describe('DigitalBook Class', () => {
         expect(ebook.format).toBe("PDF");
     });
     test("should initialize DigitalBook properties", () => {
-        const ebook = new DigitalBook("978-0-7432-7357-2", "Book", "Jane Doe", 2024, "5MB", "PDF");
+        const ebook = new DigitalBook(
+            "978-0-7432-7357-2",
+            "Book",
+            "Jane Doe",
+            2024,
+            "reference",
+            "5MB",
+            "PDF"
+        );
         expect(ebook.fileSize).toBe("5MB");
         expect(ebook.format).toBe("PDF");
         expect(ebook.downloads).toBe(0);
@@ -751,6 +776,30 @@ describe("LibraryStats", () => {
     });
 });
 
+describe("initializeUI", () => {
+
+    test("should log an error when required elements are missing", () => {
+
+        document.body.innerHTML = "";
+
+        const errorSpy = jest
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+
+        initializeUI();
+
+        expect(errorSpy).toHaveBeenCalledWith(
+            "UI elements not found."
+        );
+
+        errorSpy.mockRestore();
+
+    });
+
+    
+
+});
+
 describe('DOM Manipulation', () => {
     beforeEach(() => {
         document.body.innerHTML = `
@@ -1261,15 +1310,674 @@ describe("updateStatisticsDisplay", () => {
 
 });
 
-describe("handleBorrowSubmit", () => {
+describe("renderMemberList", () => {
 
-    let alertSpy;
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <div id="member-list"></div>
+        `;
+
+        members.length = 0;
+
+    });
+
+    test("should render no member cards when the list is empty", () => {
+
+        renderMemberList();
+
+        const container = document.getElementById("member-list");
+
+        expect(container.children.length).toBe(0);
+
+    });
+
+    test("should render one standard member", () => {
+
+        members.push(
+            new Member(
+                "001",
+                "John Doe",
+                "john@test.com",
+                "standard"
+            )
+        );
+
+        renderMemberList();
+
+        const container = document.getElementById("member-list");
+
+        expect(container.children.length).toBe(1);
+
+        expect(container.innerHTML)
+            .toContain("John Doe");
+
+        expect(container.innerHTML)
+            .toContain("john@test.com");
+
+        expect(container.innerHTML)
+            .toContain("standard");
+
+    });
+
+    test("should render one premium member", () => {
+
+        members.push(
+            new PremiumMember(
+                "002",
+                "Jane Doe",
+                "jane@test.com",
+                "premium"
+            )
+        );
+
+        renderMemberList();
+
+        const container = document.getElementById("member-list");
+
+        expect(container.children.length).toBe(1);
+
+        expect(container.innerHTML)
+            .toContain("Jane Doe");
+
+        expect(container.innerHTML)
+            .toContain("premium");
+
+    });
+
+    test("should render multiple members", () => {
+
+        members.push(
+            new Member(
+                "001",
+                "John",
+                "john@test.com",
+                "standard"
+            )
+        );
+
+        members.push(
+            new PremiumMember(
+                "002",
+                "Jane",
+                "jane@test.com",
+                "premium"
+            )
+        );
+
+        renderMemberList();
+
+        const container = document.getElementById("member-list");
+
+        expect(container.children.length).toBe(2);
+
+        expect(container.innerHTML)
+            .toContain("John");
+
+        expect(container.innerHTML)
+            .toContain("Jane");
+
+    });
+
+    // test("should display borrowed books count", () => {
+
+    //     const member = new Member(
+    //         "001",
+    //         "John",
+    //         "john@test.com",
+    //         "standard"
+    //     );
+
+    //     member.borrowedBooks.push("123");
+    //     member.borrowedBooks.push("456");
+
+    //     members.push(member);
+
+    //     renderMemberList();
+
+    //     const container = document.getElementById("member-list");
+
+    //     expect(container.innerHTML)
+    //         .toContain("2");
+
+    // });
+
+    test("should not throw when member-list container does not exist", () => {
+
+        document.body.innerHTML = "";
+
+        expect(() => renderMemberList())
+            .not.toThrow();
+
+    });
+
+});
+
+describe("handleBookClick", () => {
+
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <div id="book-details"></div>
+
+            <div class="book-card" data-isbn="123">
+                <h3 id="title">Test Book</h3>
+            </div>
+
+            <div id="outside"></div>
+        `;
+
+        books.length = 0;
+
+        books.push(
+            new Book(
+                "123",
+                "Test Book",
+                "Author",
+                2024,
+                2,
+                "fiction",
+                "physical"
+            )
+        );
+
+    });
+
+    test("should display book details when clicking the book card", () => {
+
+        handleBookClick({
+            target: document.querySelector(".book-card")
+        });
+
+        expect(
+            document.getElementById("book-details").innerHTML
+        ).toContain("Test Book");
+
+    });
+
+    test("should display book details when clicking a child element", () => {
+
+        handleBookClick({
+            target: document.getElementById("title")
+        });
+
+        expect(
+            document.getElementById("book-details").innerHTML
+        ).toContain("Test Book");
+
+    });
+
+    test("should do nothing when clicking outside a book card", () => {
+
+        handleBookClick({
+            target: document.getElementById("outside")
+        });
+
+        expect(
+            document.getElementById("book-details").innerHTML
+        ).toBe("");
+
+    });
+
+    test("should do nothing if the ISBN does not exist", () => {
+
+        document.querySelector(".book-card").dataset.isbn = "999";
+
+        handleBookClick({
+            target: document.querySelector(".book-card")
+        });
+
+        expect(
+            document.getElementById("book-details").innerHTML
+        ).toBe("");
+
+    });
+
+});
+
+describe("handleFilterChange", () => {
+
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <div id="catalogue-list"></div>
+        `;
+
+        books.length = 0;
+
+        books.push(
+            new Book(
+                "111",
+                "Things Fall Apart",
+                "Chinua Achebe",
+                1958,
+                2,
+                "fiction",
+                "physical"
+            )
+        );
+
+        books.push(
+            new Book(
+                "222",
+                "Sapiens",
+                "Yuval Noah Harari",
+                2011,
+                2,
+                "non-fiction",
+                "physical"
+            )
+        );
+
+        books.push(
+            new Book(
+                "333",
+                "Clean Code",
+                "Robert C. Martin",
+                2008,
+                2,
+                "reference",
+                "physical"
+            )
+        );
+
+    });
+
+    test("should display all books", () => {
+
+        handleFilterChange({
+            target: {
+                value: "all"
+            }
+        });
+
+        expect(document.querySelectorAll(".book-card").length)
+            .toBe(3);
+
+    });
+
+    test("should filter fiction books", () => {
+
+        handleFilterChange({
+            target: {
+                value: "fiction"
+            }
+        });
+
+        const catalogue = document.getElementById("catalogue-list");
+
+        expect(catalogue.innerHTML)
+            .toContain("Things Fall Apart");
+
+        expect(document.querySelectorAll(".book-card").length)
+            .toBe(1);
+
+    });
+
+    test("should filter non-fiction books", () => {
+
+        handleFilterChange({
+            target: {
+                value: "non-fiction"
+            }
+        });
+
+        const catalogue = document.getElementById("catalogue-list");
+
+        expect(catalogue.innerHTML)
+            .toContain("Sapiens");
+
+        expect(document.querySelectorAll(".book-card").length)
+            .toBe(1);
+
+    });
+
+    test("should filter reference books", () => {
+
+        handleFilterChange({
+            target: {
+                value: "reference"
+            }
+        });
+
+        const catalogue = document.getElementById("catalogue-list");
+
+        expect(catalogue.innerHTML)
+            .toContain("Clean Code");
+
+        expect(document.querySelectorAll(".book-card").length)
+            .toBe(1);
+
+    });
+
+    test("should render no books for an invalid category", () => {
+
+        handleFilterChange({
+            target: {
+                value: "history"
+            }
+        });
+
+        expect(document.querySelectorAll(".book-card").length)
+            .toBe(0);
+
+    });
+
+});
+
+describe("loadCatalogue", () => {
+
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <div id="catalogue-list"></div>
+        `;
+
+        books.length = 0;
+
+        global.fetch = jest.fn();
+
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("should load physical books", async () => {
+
+        fetch.mockResolvedValue({
+            json: async () => ({
+                books: [
+                    {
+                        isbn: "111",
+                        title: "Things Fall Apart",
+                        author: "Achebe",
+                        year: 1958,
+                        copies: 3,
+                        category: "fiction",
+                        type: "physical"
+                    }
+                ]
+            })
+        });
+
+        await loadCatalogue();
+
+        expect(fetch)
+            .toHaveBeenCalledWith("../data/books.json");
+
+        expect(books.length)
+            .toBe(1);
+
+        expect(books[0])
+            .toBeInstanceOf(Book);
+
+        expect(books[0].title)
+            .toBe("Things Fall Apart");
+
+    });
+
+    test("should load digital books", async () => {
+
+        fetch.mockResolvedValue({
+            json: async () => ({
+                books: [
+                    {
+                        isbn: "222",
+                        title: "Clean Code",
+                        author: "Robert Martin",
+                        year: 2008,
+                        category: "reference",
+                        type: "digital",
+                        fileSize: "5MB",
+                        format: "PDF"
+                    }
+                ]
+            })
+        });
+
+        await loadCatalogue();
+
+        expect(books.length)
+            .toBe(1);
+
+        expect(books[0])
+            .toBeInstanceOf(DigitalBook);
+
+        expect(books[0].fileSize)
+            .toBe("5MB");
+
+        expect(books[0].format)
+            .toBe("PDF");
+
+    });
+
+    test("should load both physical and digital books", async () => {
+
+        fetch.mockResolvedValue({
+            json: async () => ({
+                books: [
+                    {
+                        isbn: "111",
+                        title: "Book One",
+                        author: "Author",
+                        year: 2024,
+                        copies: 2,
+                        category: "fiction",
+                        type: "physical"
+                    },
+                    {
+                        isbn: "222",
+                        title: "Book Two",
+                        author: "Author",
+                        year: 2024,
+                        category: "reference",
+                        type: "digital",
+                        fileSize: "8MB",
+                        format: "EPUB"
+                    }
+                ]
+            })
+        });
+
+        await loadCatalogue();
+
+        expect(books.length)
+            .toBe(2);
+
+        expect(books[0])
+            .toBeInstanceOf(Book);
+
+        expect(books[1])
+            .toBeInstanceOf(DigitalBook);
+
+    });
+
+    test("should render the catalogue after loading", async () => {
+
+        fetch.mockResolvedValue({
+            json: async () => ({
+                books: [
+                    {
+                        isbn: "111",
+                        title: "Rendered Book",
+                        author: "Author",
+                        year: 2024,
+                        copies: 2,
+                        category: "fiction",
+                        type: "physical"
+                    }
+                ]
+            })
+        });
+
+        await loadCatalogue();
+
+        expect(document.getElementById("catalogue-list").innerHTML)
+            .toContain("Rendered Book");
+
+    });
+
+    test("should handle fetch errors", async () => {
+
+        const errorSpy = jest
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+
+        fetch.mockRejectedValue(new Error("Network Error"));
+
+        await loadCatalogue();
+
+        expect(errorSpy)
+            .toHaveBeenCalled();
+
+    });
+
+});
+
+describe("setupEventListeners", () => {
+
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <input id="search">
+
+            <select id="filter-category">
+                <option value="all">All</option>
+            </select>
+
+            <div id="catalogue-list"></div>
+
+            <form id="borrow-form"></form>
+
+            <button id="catalogue-tab"></button>
+            <button id="members-tab"></button>
+            <button id="statistics-tab"></button>
+
+            <div id="member-form"></div>
+            <div id="member-list"></div>
+
+            <section id="catalogue-section"></section>
+            <section id="members-section"></section>
+            <section id="statistics-section"></section>
+
+            <div id="book-details"></div>
+
+            <p id="total-books"></p>
+            <p id="total-members"></p>
+            <p id="books-borrowed"></p>
+        `;
+
+        jest.spyOn(global, "fetch").mockResolvedValue({
+            json: async () => ({ books: [] })
+        });
+
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("should initialize without throwing", async () => {
+
+        await initializeUI();
+
+        expect(document.getElementById("search")).not.toBeNull();
+
+    });
+
+    test("should attach the search listener", async () => {
+
+        const spy = jest.spyOn(
+            HTMLInputElement.prototype,
+            "addEventListener"
+        );
+
+        await initializeUI();
+
+        expect(spy).toHaveBeenCalledWith(
+            "input",
+            handleSearch
+        );
+
+    });
+
+    test("should attach the category filter listener", async () => {
+
+        const spy = jest.spyOn(
+            HTMLSelectElement.prototype,
+            "addEventListener"
+        );
+
+        await initializeUI();
+
+        expect(spy).toHaveBeenCalledWith(
+            "change",
+            handleFilterChange
+        );
+
+    });
+
+    test("should attach the borrow form listener", async () => {
+
+        const spy = jest.spyOn(
+            HTMLFormElement.prototype,
+            "addEventListener"
+        );
+
+        await initializeUI();
+
+        expect(spy).toHaveBeenCalledWith(
+            "submit",
+            handleBorrowSubmit
+        );
+
+    });
+
+    test("should attach the catalogue click listener", async () => {
+
+        const spy = jest.spyOn(
+            HTMLDivElement.prototype,
+            "addEventListener"
+        );
+
+        await initializeUI();
+
+        expect(spy).toHaveBeenCalledWith(
+            "click",
+            handleBookClick
+        );
+
+    });
+
+    test("should attach navigation listeners", async () => {
+
+        const spy = jest.spyOn(
+            HTMLButtonElement.prototype,
+            "addEventListener"
+        );
+
+        await initializeUI();
+
+        expect(spy).toHaveBeenCalledWith(
+            "click",
+            expect.any(Function)
+        );
+
+    });
+
+});
+
+describe("handleBorrowSubmit", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="message-box" class="hidden"></div>
+
             <form id="borrow-form">
                 <input id="member-id">
                 <input id="isbn">
+
                 <div id="catalogue-list"></div>
 
                 <p id="total-books"></p>
@@ -1293,20 +2001,14 @@ describe("handleBorrowSubmit", () => {
             )
         );
 
-        const member = new Member(
-            "001",
-            "John",
-            "john@test.com",
-            "standard"
+        members.push(
+            new Member(
+                "001",
+                "John",
+                "john@test.com",
+                "standard"
+            )
         );
-
-        members.push(member);
-
-        alertSpy = jest.spyOn(window, "alert").mockImplementation(() => { });
-    });
-
-    afterEach(() => {
-        alertSpy.mockRestore();
     });
 
     test("should call preventDefault", () => {
@@ -1322,7 +2024,7 @@ describe("handleBorrowSubmit", () => {
 
     });
 
-    test("should alert when inputs are empty", () => {
+    test("should show an error when inputs are empty", () => {
 
         const event = {
             preventDefault: jest.fn(),
@@ -1331,43 +2033,168 @@ describe("handleBorrowSubmit", () => {
 
         handleBorrowSubmit(event);
 
-        expect(alertSpy)
-            .toHaveBeenCalledWith("Please enter both Member ID and ISBN.");
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Please enter both Member ID and ISBN.");
+
+        expect(messageBox.className)
+            .toContain("error");
 
     });
 
-   test("should show member not found", () => {
+    test("should show member not found", () => {
 
-    document.getElementById("member-id").value = "999";
-    document.getElementById("isbn").value = "123";
+        document.getElementById("member-id").value = "999";
+        document.getElementById("isbn").value = "123";
 
-    const event = {
-        preventDefault: jest.fn(),
-        target: document.getElementById("borrow-form")
-    };
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("borrow-form")
+        };
 
-    handleBorrowSubmit(event);
+        handleBorrowSubmit(event);
 
-    expect(alertSpy).toHaveBeenCalledWith(
-        "Member '999' does not exist."
-    );
-});
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Member '999' does not exist.");
+
+        expect(messageBox.className)
+            .toContain("error");
+
+    });
+
     test("should show book not found", () => {
 
-    document.getElementById("member-id").value = "001";
-    document.getElementById("isbn").value = "999";
+        document.getElementById("member-id").value = "001";
+        document.getElementById("isbn").value = "999";
 
-    const event = {
-        preventDefault: jest.fn(),
-        target: document.getElementById("borrow-form")
-    };
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("borrow-form")
+        };
 
-    handleBorrowSubmit(event);
+        handleBorrowSubmit(event);
 
-    expect(alertSpy).toHaveBeenCalledWith(
-        "Book with ISBN '999' was not found."
-    );
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Book with ISBN '999' was not found.");
+
+        expect(messageBox.className)
+            .toContain("error");
+
+    });
+
+    test("should show a success message when borrowing succeeds", () => {
+
+        document.getElementById("member-id").value = "001";
+        document.getElementById("isbn").value = "123";
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("borrow-form")
+        };
+
+        handleBorrowSubmit(event);
+
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("\"Test Book\" has been borrowed successfully.");
+
+        expect(messageBox.className)
+            .toContain("success");
+
+    });
+
 });
+
+describe("showMessage", () => {
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+
+        document.body.innerHTML = `
+            <div id="message-box" class="hidden"></div>
+        `;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test("should display a success message", () => {
+
+        showMessage("Book borrowed successfully!", "success");
+
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Book borrowed successfully!");
+
+        expect(messageBox.className)
+            .toContain("success");
+
+        expect(messageBox.classList.contains("hidden"))
+            .toBe(false);
+
+    });
+
+    test("should display an error message", () => {
+
+        showMessage("Member not found.", "error");
+
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Member not found.");
+
+        expect(messageBox.className)
+            .toContain("error");
+
+    });
+
+    test("should use info as the default type", () => {
+
+        showMessage("Welcome!");
+
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.textContent)
+            .toBe("Welcome!");
+
+        expect(messageBox.className)
+            .toContain("info");
+
+    });
+
+    test("should hide the message after 5 seconds", () => {
+
+        showMessage("Temporary message", "success");
+
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.classList.contains("hidden"))
+            .toBe(false);
+
+        jest.advanceTimersByTime(5000);
+
+        expect(messageBox.classList.contains("hidden"))
+            .toBe(true);
+
+    });
+
+    test("should do nothing if the message box does not exist", () => {
+
+        document.body.innerHTML = "";
+
+        expect(() => {
+            showMessage("Hello");
+        }).not.toThrow();
+
+    });
 
 });
 
@@ -1375,6 +2202,7 @@ describe("createMemberForm", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="message-box" class="hidden"></div>
             <div id="member-form"></div>
 
             <p id="total-books"></p>
@@ -1420,10 +2248,6 @@ describe("createMemberForm", () => {
 
         createMemberForm();
 
-        const alertSpy = jest
-            .spyOn(window, "alert")
-            .mockImplementation(() => { });
-
         document.getElementById("name").value = "";
         document.getElementById("email").value = "";
 
@@ -1436,19 +2260,19 @@ describe("createMemberForm", () => {
                 })
             );
 
-        expect(alertSpy)
-            .toHaveBeenCalledWith("Please complete all fields.");
+        const messageBox = document.getElementById("message-box");
 
-        alertSpy.mockRestore();
+        expect(messageBox.textContent)
+            .toBe("Please complete all fields.");
+
+        expect(messageBox.className)
+            .toContain("error");
 
     });
 
     test("should create a standard member", () => {
 
         createMemberForm();
-
-        jest.spyOn(window, "alert")
-            .mockImplementation(() => { });
 
         document.getElementById("name").value = "John";
         document.getElementById("email").value = "john@test.com";
@@ -1466,15 +2290,28 @@ describe("createMemberForm", () => {
         expect(members.length).toBe(1);
         expect(members[0]).toBeInstanceOf(Member);
 
-        window.alert.mockRestore();
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.innerHTML)
+            .toContain("Member added successfully!");
+
+        expect(messageBox.innerHTML)
+            .toContain("Member ID: 001");
+
+        expect(messageBox.innerHTML)
+            .toContain("Name: John");
+
+        expect(messageBox.innerHTML)
+            .toContain("Membership: standard");
+
+        expect(messageBox.className)
+            .toContain("success");
 
     });
+
     test("should create a premium member", () => {
 
         createMemberForm();
-
-        jest.spyOn(window, "alert")
-            .mockImplementation(() => { });
 
         document.getElementById("name").value = "Jane";
         document.getElementById("email").value = "jane@test.com";
@@ -1492,7 +2329,22 @@ describe("createMemberForm", () => {
         expect(members.length).toBe(1);
         expect(members[0]).toBeInstanceOf(PremiumMember);
 
-        window.alert.mockRestore();
+        const messageBox = document.getElementById("message-box");
+
+        expect(messageBox.innerHTML)
+            .toContain("Member added successfully!");
+
+        expect(messageBox.innerHTML)
+            .toContain("Member ID: 001");
+
+        expect(messageBox.innerHTML)
+            .toContain("Name: Jane");
+
+        expect(messageBox.innerHTML)
+            .toContain("Membership: premium");
+
+        expect(messageBox.className)
+            .toContain("success");
 
     });
 

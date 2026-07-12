@@ -72,7 +72,7 @@ class Book {
 
 // Digital book class with inheritance
 class DigitalBook extends Book {
-    constructor(isbn, title, author, year, fileSize, format, category) {
+    constructor(isbn, title, author, year, category, fileSize, format, ) {
         // Missing: super() call with correct parameters
         super(isbn, title, author, year, Infinity, category, "digital")
         this.fileSize = fileSize;

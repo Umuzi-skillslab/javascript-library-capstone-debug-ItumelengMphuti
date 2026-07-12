@@ -323,6 +323,41 @@ form button:hover {
     font-weight: bold;
 }
 
+
+/* ============================
+     HELPER FUNTION
+=========================== */
+
+#message-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
+
+#message-box.hidden {
+    display: none;
+}
+
+#message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #28a745;
+}
+
+#message-box.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #dc3545;
+}
+
+#message-box.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #17a2b8;
+}
+
 /* ===========================
    ACCESSIBILITY
 =========================== */

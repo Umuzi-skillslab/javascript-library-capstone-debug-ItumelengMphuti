@@ -12,6 +12,8 @@ import {
     LibraryStats
 } from "./library.js";
 
+import { showMessage } from "./utils.js";
+
 // Missing: proper initialization with DOMContentLoaded
 if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", initializeUI);
@@ -111,7 +113,7 @@ async function loadCatalogue() {
         books.length = 0;
 
         data.books.forEach(book => {
-            if (book.type === "Digital") {
+            if (book.type === "digital") {
                 books.push(
                     new DigitalBook(
                         book.isbn,
@@ -167,7 +169,7 @@ function renderBookCatalogue(bookList) {
         <p><strong>Author:</strong> ${book.author}</p>
         <p><strong>Type:</strong> ${book.type.charAt(0).toUpperCase() + book.type.slice(1)}</p>
         <p><strong>Category:</strong> ${book.category.charAt(0).toUpperCase() + book.category.slice(1)}</p>
-        <p><strong>Available:</strong> ${book.type === "ebook" ? "Unlimited" : book.availableCopies
+        <p><strong>Available:</strong> ${book.type === "digital" ? "Unlimited" : book.availableCopies
             }</p>
         `;
 
@@ -185,24 +187,31 @@ function handleBorrowSubmit(event) {
     const isbn = document.getElementById("isbn").value.trim();
 
     if (!memberId || !isbn) {
-        alert("Please enter both Member ID and ISBN.");
+        showMessage("Please enter both Member ID and ISBN.",
+            "error"
+        );
         return;
     }
 
     try {
         const result = borrowBook(memberId, isbn);
 
-        alert(result.message);
+showMessage(
+    result.message,
+    result.success ? "success" : "error"
+);
 
-        if (result.success) {
-            event.target.reset();
-            renderBookCatalogue(books);
-            updateStatisticsDisplay();
-        }
+if (result.success) {
+    event.target.reset();
+    renderBookCatalogue(books);
+    updateStatisticsDisplay();
+}
 
     } catch (error) {
         console.error(error);
-        alert("An unexpected error occurred.");
+        showMessage(
+            "An unexpected error occurred.",
+            "error");
     }
 }
 
@@ -231,14 +240,18 @@ function handleSearch(event) {
 }
 
 // Function with filter errors
-function handleFilterChange() {
-    const selectedCategory = filterDropdown.value;
+function handleFilterChange(event) {
+    const selectedCategory = event.target.value;
 
     if (selectedCategory === "all") {
         renderBookCatalogue(books);
         return;
     }
-    const filtered = books.filter(book => book.category === selectedCategory);
+
+    const filtered = books.filter(
+        book => book.category === selectedCategory
+    );
+
     renderBookCatalogue(filtered);
 }
 
@@ -444,7 +457,9 @@ function createMemberForm() {
         const membershipType = document.getElementById("membership-type").value;
 
         if (!name || !email) {
-            alert("Please complete all fields.");
+            showMessage("Please complete all fields.",
+                "error"
+            );
             return;
         }
 
@@ -461,6 +476,7 @@ function createMemberForm() {
                 id,
                 name,
                 email,
+                membershipType,
                 joinDate
             );
         } else {
@@ -483,14 +499,13 @@ function createMemberForm() {
         updateStatisticsDisplay();
 
         // Show confirmation
-        alert(
-            `Member added successfully!
-
-        Member ID: ${member.id}
-        Name: ${member.name}
-        Email: ${member.email}
-        Membership: ${member.membershipType}
-        Join Date: ${member.joinDate}`
+        showMessage(
+            `Member added successfully!<br>
+            Member ID: ${member.id}<br>
+            Name: ${member.name}<br>
+            Email: ${member.email}<br>
+            Membership: ${member.membershipType}`,
+            "success"
         );
 
         // Reset the form
@@ -499,14 +514,19 @@ function createMemberForm() {
 }
 
 export {
+    initializeUI,
     renderBookCatalogue,
+    renderMemberList,
+    handleBookClick,
     handleSearch,
     displayBookDetails,
+    loadCatalogue,
     handleBorrowSubmit,
     handleFilterChange,
     updateStatisticsDisplay,
     createMemberForm,
     exportLibraryData,
+    setupEventListeners,
     importLibraryData,
     saveToLocalStorage,
     loadFromLocalStorage

@@ -118,7 +118,7 @@
       "copies": 4
     },
     {
-      "type": "Physical",
+      "type": "physical",
       "isbn": "978-0-7432-7358-9",
       "title": "A Grain of Wheat",
       "author": "Ngũgĩ wa Thiong'o",
@@ -127,7 +127,7 @@
       "copies": 2
     },
     {
-      "type": "Physical",
+      "type": "physical",
       "isbn": "978-0-2460-3943-5",
       "title": "The Oxford Dictionary of Computing",
       "author": "Andrew Butterfield",
@@ -142,7 +142,9 @@
       "author": "Michelle Obama",
       "year": 2018,
       "category": "non-fiction",
-      "copies": 4
+      "copies": 4,
+      "fileSize": "8 MB",
+      "format": "PDF"
     },
     {
       "type": "digital",
@@ -151,7 +153,9 @@
       "author": "Alex Michaelides",
       "year": 2019,
       "category": "fiction",
-      "copies": 3
+      "copies": 3,
+      "fileSize": "7 MB",
+      "format": "PDF"
     },
     {
       "type": "digital",
@@ -160,7 +164,9 @@
       "author": "Andrew Hunt",
       "year": 1999,
       "category": "reference",
-      "copies": 4
+      "copies": 4,
+      "fileSize": "12 MB",
+      "format": "PDF"
     },
     {
       "type": "digital",
@@ -169,7 +175,10 @@
       "author": "Matt Haig",
       "year": 2020,
       "category": "fiction",
-      "copies": 5
+      "copies": 5,
+      "fileSize": "10 MB",
+      "format": "PDF"
+      
     },
     {
       "type": "digital",
@@ -178,7 +187,9 @@
       "author": "David Flanagan",
       "year": 2020,
       "category": "reference",
-      "copies": 3
+      "copies": 3,
+      "fileSize": "8 MB",
+      "format": "PDF"
     }
   ]
 }
