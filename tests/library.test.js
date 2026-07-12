@@ -1,4 +1,8 @@
-import { beforeEach, expect, jest } from '@jest/globals'
+
+/**
+ * @jest-environment jsdom
+ */
+import { beforeEach, describe, expect, jest } from '@jest/globals'
 
 import {
     books,
@@ -22,6 +26,20 @@ import {
     formatBookInfo,
     calculateFineAmount
 } from "../src/library.js";
+
+import {
+    renderBookCatalogue,
+    handleSearch,
+    displayBookDetails,
+    handleBorrowSubmit,
+    handleFilterChange,
+    updateStatisticsDisplay,
+    createMemberForm,
+    exportLibraryData,
+    importLibraryData,
+    saveToLocalStorage,
+    loadFromLocalStorage
+} from "../src/ui.js";
 
 describe('Book Class', () => {
     beforeEach(() => {
@@ -123,18 +141,18 @@ describe('Book Class', () => {
     });
 
     test("should not reserve the same book twice", () => {
-    const book = new Book(
-        "ISBN1",
-        "Book",
-        "Author",
-        2020,
-        0
-    );
+        const book = new Book(
+            "ISBN1",
+            "Book",
+            "Author",
+            2020,
+            0
+        );
 
-    book.reserveBook("001");
+        book.reserveBook("001");
 
-    expect(book.reserveBook("001")).toBe(false);
-});
+        expect(book.reserveBook("001")).toBe(false);
+    });
 
     test("should allow a member to reserve a book with no available copies", () => {
         const book = new Book("978-0-7432-7357-2", "The Fake Book", "John Doe", 2010, 0);
@@ -591,11 +609,17 @@ describe("Recursive Functions", () => {
 describe("Error Handling", () => {
 
     test("should return false for null memberId", () => {
-        expect(borrowBook(null, "ISBN1")).toBe(false);
+        expect(borrowBook(null, "ISBN1")).toEqual({
+            message: "Please enter both a Member ID and an ISBN.",
+            success: false
+        });
     });
 
     test("should return false for null ISBN", () => {
-        expect(borrowBook("001", null)).toBe(false);
+        expect(borrowBook("001", null)).toEqual({
+            message: "Please enter both a Member ID and an ISBN.",
+            success: false
+        });
     });
 
     test("should return null for invalid fine input", () => {
@@ -728,28 +752,748 @@ describe("LibraryStats", () => {
 });
 
 describe('DOM Manipulation', () => {
-    // Missing: DOM setup with jsdom
-    // Missing: tests for event handlers
-    // Missing: tests for renderBookCatalogue
-    // Missing: tests for search functionality
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <input id="search">
+            <select id="filter-category"></select>
+            <div id="catalogue-list"></div>
+            <div id="book-details"></div>
+        `;
+    });
+
+    test("should render all books", () => {
+
+        const testBooks = [
+            {
+                isbn: "1",
+                title: "Book One",
+                author: "Author One",
+                category: "fiction",
+                type: "physical",
+                availableCopies: 3
+            },
+            {
+                isbn: "2",
+                title: "Book Two",
+                author: "Author Two",
+                category: "reference",
+                type: "ebook",
+                availableCopies: Infinity
+            }
+        ];
+
+        renderBookCatalogue(testBooks);
+
+        const cards = document.querySelectorAll(".book-card");
+
+        expect(cards.length).toBe(2);
+    });
+
+    test("should display the correct title", () => {
+
+        const testBooks = [{
+            isbn: "1",
+            title: "Things Fall Apart",
+            author: "Achebe",
+            category: "fiction",
+            type: "physical",
+            availableCopies: 2
+        }];
+
+        renderBookCatalogue(testBooks);
+
+        expect(document.body.textContent)
+            .toContain("Things Fall Apart");
+
+    });
+
+    test("should display the author", () => {
+
+        const testBooks = [{
+            isbn: "1",
+            title: "Atomic Habits",
+            author: "James Clear",
+            category: "non-fiction",
+            type: "physical",
+            availableCopies: 4
+        }];
+
+        renderBookCatalogue(testBooks);
+
+        expect(document.body.textContent)
+            .toContain("James Clear");
+
+    });
+
+    test("should capitalize the category", () => {
+
+        const testBooks = [{
+            isbn: "1",
+            title: "Book",
+            author: "Author",
+            category: "fiction",
+            type: "physical",
+            availableCopies: 3
+        }];
+
+        renderBookCatalogue(testBooks);
+
+        expect(document.body.textContent)
+            .toContain("Fiction");
+
+    });
+
+    test("should capitalize the book type", () => {
+
+        const testBooks = [{
+            isbn: "1",
+            title: "Book",
+            author: "Author",
+            category: "fiction",
+            type: "ebook",
+            availableCopies: Infinity
+        }];
+
+        renderBookCatalogue(testBooks);
+
+        expect(document.body.textContent)
+            .toContain("Ebook");
+
+    });
+
 });
 
-describe('JSON Operations', () => {
-    // Missing: tests for JSON.stringify
-    // Missing: tests for JSON.parse
-    // Missing: tests for error handling in JSON operations
+describe("JSON Operations", () => {
+
+    beforeEach(() => {
+        books.length = 0;
+        members.length = 0;
+
+        books.push(
+            new Book(
+                "978-0-123",
+                "Test Book",
+                "Test Author",
+                2024,
+                3,
+                "fiction",
+                "physical"
+            )
+        );
+
+        members.push(
+            new Member(
+                "001",
+                "John Doe",
+                "john@test.com",
+                "standard"
+            )
+        );
+    });
+
+    test("should export library data as a JSON string", () => {
+        const json = exportLibraryData();
+
+        expect(typeof json).toBe("string");
+    });
+
+    test("should export books and members", () => {
+        const json = exportLibraryData();
+        const data = JSON.parse(json);
+
+        expect(data.books.length).toBe(1);
+        expect(data.members.length).toBe(1);
+
+        expect(data.books[0].title).toBe("Test Book");
+        expect(data.members[0].name).toBe("John Doe");
+    });
+
+    test("should import library data", () => {
+
+        const json = JSON.stringify({
+            books: [
+                {
+                    isbn: "111",
+                    title: "Imported Book",
+                    author: "Author",
+                    year: 2025,
+                    availableCopies: 2,
+                    totalCopies: 2,
+                    category: "fiction",
+                    type: "physical",
+                    checkedOut: [],
+                    reservationQueue: []
+                }
+            ],
+            members: [
+                {
+                    id: "002",
+                    name: "Jane Doe",
+                    email: "jane@test.com",
+                    membershipType: "standard",
+                    borrowedBooks: [],
+                    downloadedBooks: []
+                }
+            ]
+        });
+
+        importLibraryData(json);
+
+        expect(books.length).toBe(1);
+        expect(members.length).toBe(1);
+
+        expect(books[0].title).toBe("Imported Book");
+        expect(members[0].name).toBe("Jane Doe");
+    });
+
+    test("should log an error for invalid JSON", () => {
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+
+        importLibraryData("{invalid json}");
+
+        expect(consoleSpy).toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+    });
+
 });
 
-describe('LocalStorage', () => {
-    // Missing: localStorage mock
-    // Missing: tests for save functionality
-    // Missing: tests for load functionality
-    // Missing: tests for error handling
+describe("LocalStorage", () => {
+
+    beforeEach(() => {
+        localStorage.clear();
+
+        books.length = 0;
+        members.length = 0;
+
+        books.push(
+            new Book(
+                "978-0-123",
+                "Test Book",
+                "Test Author",
+                2024,
+                3,
+                "fiction",
+                "physical"
+            )
+        );
+
+        members.push(
+            new Member(
+                "001",
+                "John Doe",
+                "john@test.com",
+                "standard"
+            )
+        );
+    });
+
+    test("should save books to localStorage", () => {
+        saveToLocalStorage();
+
+        const savedBooks = JSON.parse(
+            localStorage.getItem("libraryBooks")
+        );
+
+        expect(savedBooks).toHaveLength(1);
+        expect(savedBooks[0].title).toBe("Test Book");
+    });
+
+    test("should save members to localStorage", () => {
+        saveToLocalStorage();
+
+        const savedMembers = JSON.parse(
+            localStorage.getItem("libraryMembers")
+        );
+
+        expect(savedMembers).toHaveLength(1);
+        expect(savedMembers[0].name).toBe("John Doe");
+    });
+
+    test("should load books and members from localStorage", () => {
+
+        saveToLocalStorage();
+
+        books.length = 0;
+        members.length = 0;
+
+        loadFromLocalStorage();
+
+        expect(books).toHaveLength(1);
+        expect(members).toHaveLength(1);
+
+        expect(books[0].title).toBe("Test Book");
+        expect(members[0].name).toBe("John Doe");
+    });
+
+    test("should handle empty localStorage", () => {
+
+        localStorage.clear();
+
+        expect(() => loadFromLocalStorage()).not.toThrow();
+    });
+
 });
 
-// Missing: describe blocks for:
-// - Nested loops
-// - For-of loops
-// - Destructuring
-// - Scope testing (var, let, const)
-// - Module exports/imports
+describe("displayBookDetails", () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="book-details"></div>
+        `;
+
+        books.length = 0;
+
+        books.push(
+            new Book(
+                "123",
+                "Atomic Habits",
+                "James Clear",
+                2018,
+                5,
+                "non-fiction",
+                "physical"
+            )
+        );
+    });
+
+    test("should display the selected book title", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("Atomic Habits");
+    });
+
+    test("should display the author", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("James Clear");
+    });
+
+    test("should display the ISBN", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("123");
+    });
+
+    test("should display the year", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("2018");
+    });
+
+    test("should not throw when book is not found", () => {
+        expect(() => displayBookDetails("999")).not.toThrow();
+    });
+});
+
+describe("displayBookDetails", () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="book-details"></div>
+        `;
+
+        books.length = 0;
+
+        books.push(
+            new Book(
+                "123",
+                "Atomic Habits",
+                "James Clear",
+                2018,
+                5,
+                "non-fiction",
+                "physical"
+            )
+        );
+    });
+
+    test("should display the book title", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("Atomic Habits");
+    });
+
+    test("should display the author", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("James Clear");
+    });
+
+    test("should display the ISBN", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("123");
+    });
+
+    test("should display the publication year", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("2018");
+    });
+
+    test("should display the capitalized type", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("Physical");
+    });
+
+    test("should display the capitalized category", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("Non-fiction");
+    });
+
+    test("should display available copies", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("5");
+    });
+
+    test("should display total copies", () => {
+        displayBookDetails("123");
+
+        expect(document.getElementById("book-details").textContent)
+            .toContain("5");
+    });
+
+    test("should do nothing if the book does not exist", () => {
+        displayBookDetails("999");
+
+        expect(document.getElementById("book-details").innerHTML)
+            .toBe("");
+    });
+
+});
+
+describe("updateStatisticsDisplay", () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <p id="total-books"></p>
+            <p id="total-members"></p>
+            <p id="books-borrowed"></p>
+        `;
+
+        books.length = 0;
+        members.length = 0;
+
+        books.push(
+            new Book(
+                "111",
+                "Book One",
+                "Author One",
+                2024,
+                3,
+                "fiction",
+                "physical"
+            )
+        );
+
+        books.push(
+            new Book(
+                "222",
+                "Book Two",
+                "Author Two",
+                2023,
+                2,
+                "reference",
+                "physical"
+            )
+        );
+
+        members.push(
+            new Member(
+                "001",
+                "John Doe",
+                "john@test.com",
+                "standard"
+            )
+        );
+    });
+
+    test("should display the total number of books", () => {
+        updateStatisticsDisplay();
+
+        expect(document.getElementById("total-books").textContent)
+            .toBe("2");
+    });
+
+    test("should display the total number of members", () => {
+        updateStatisticsDisplay();
+
+        expect(document.getElementById("total-members").textContent)
+            .toBe("1");
+    });
+
+    test("should display zero borrowed books initially", () => {
+        updateStatisticsDisplay();
+
+        expect(document.getElementById("books-borrowed").textContent)
+            .toBe("0");
+    });
+
+    test("should update borrowed books after a checkout", () => {
+        books[0].checkOut("001");
+
+        updateStatisticsDisplay();
+
+        expect(document.getElementById("books-borrowed").textContent)
+            .toBe("1");
+    });
+
+    test("should do nothing if statistic elements are missing", () => {
+        document.body.innerHTML = "";
+
+        expect(() => updateStatisticsDisplay()).not.toThrow();
+    });
+
+});
+
+describe("handleBorrowSubmit", () => {
+
+    let alertSpy;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <form id="borrow-form">
+                <input id="member-id">
+                <input id="isbn">
+                <div id="catalogue-list"></div>
+
+                <p id="total-books"></p>
+                <p id="total-members"></p>
+                <p id="books-borrowed"></p>
+            </form>
+        `;
+
+        books.length = 0;
+        members.length = 0;
+
+        books.push(
+            new Book(
+                "123",
+                "Test Book",
+                "Author",
+                2024,
+                2,
+                "fiction",
+                "physical"
+            )
+        );
+
+        const member = new Member(
+            "001",
+            "John",
+            "john@test.com",
+            "standard"
+        );
+
+        members.push(member);
+
+        alertSpy = jest.spyOn(window, "alert").mockImplementation(() => { });
+    });
+
+    afterEach(() => {
+        alertSpy.mockRestore();
+    });
+
+    test("should call preventDefault", () => {
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("borrow-form")
+        };
+
+        handleBorrowSubmit(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+
+    });
+
+    test("should alert when inputs are empty", () => {
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("borrow-form")
+        };
+
+        handleBorrowSubmit(event);
+
+        expect(alertSpy)
+            .toHaveBeenCalledWith("Please enter both Member ID and ISBN.");
+
+    });
+
+   test("should show member not found", () => {
+
+    document.getElementById("member-id").value = "999";
+    document.getElementById("isbn").value = "123";
+
+    const event = {
+        preventDefault: jest.fn(),
+        target: document.getElementById("borrow-form")
+    };
+
+    handleBorrowSubmit(event);
+
+    expect(alertSpy).toHaveBeenCalledWith(
+        "Member '999' does not exist."
+    );
+});
+    test("should show book not found", () => {
+
+    document.getElementById("member-id").value = "001";
+    document.getElementById("isbn").value = "999";
+
+    const event = {
+        preventDefault: jest.fn(),
+        target: document.getElementById("borrow-form")
+    };
+
+    handleBorrowSubmit(event);
+
+    expect(alertSpy).toHaveBeenCalledWith(
+        "Book with ISBN '999' was not found."
+    );
+});
+
+});
+
+describe("createMemberForm", () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="member-form"></div>
+
+            <p id="total-books"></p>
+            <p id="total-members"></p>
+            <p id="books-borrowed"></p>
+        `;
+
+        members.length = 0;
+        books.length = 0;
+    });
+
+    test("should render the member form", () => {
+
+        createMemberForm();
+
+        expect(document.getElementById("new-member-form"))
+            .not.toBeNull();
+
+    });
+
+    test("should create all form fields", () => {
+
+        createMemberForm();
+
+        expect(document.getElementById("name")).not.toBeNull();
+        expect(document.getElementById("email")).not.toBeNull();
+        expect(document.getElementById("membership-type")).not.toBeNull();
+
+    });
+
+    test("should create a submit button", () => {
+
+        createMemberForm();
+
+        const button = document.querySelector("button[type='submit']");
+
+        expect(button).not.toBeNull();
+        expect(button.textContent).toBe("Add Member");
+
+    });
+
+    test("should require all fields", () => {
+
+        createMemberForm();
+
+        const alertSpy = jest
+            .spyOn(window, "alert")
+            .mockImplementation(() => { });
+
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+
+        document
+            .getElementById("new-member-form")
+            .dispatchEvent(
+                new Event("submit", {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+        expect(alertSpy)
+            .toHaveBeenCalledWith("Please complete all fields.");
+
+        alertSpy.mockRestore();
+
+    });
+
+    test("should create a standard member", () => {
+
+        createMemberForm();
+
+        jest.spyOn(window, "alert")
+            .mockImplementation(() => { });
+
+        document.getElementById("name").value = "John";
+        document.getElementById("email").value = "john@test.com";
+        document.getElementById("membership-type").value = "standard";
+
+        document
+            .getElementById("new-member-form")
+            .dispatchEvent(
+                new Event("submit", {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+        expect(members.length).toBe(1);
+        expect(members[0]).toBeInstanceOf(Member);
+
+        window.alert.mockRestore();
+
+    });
+    test("should create a premium member", () => {
+
+        createMemberForm();
+
+        jest.spyOn(window, "alert")
+            .mockImplementation(() => { });
+
+        document.getElementById("name").value = "Jane";
+        document.getElementById("email").value = "jane@test.com";
+        document.getElementById("membership-type").value = "premium";
+
+        document
+            .getElementById("new-member-form")
+            .dispatchEvent(
+                new Event("submit", {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+        expect(members.length).toBe(1);
+        expect(members[0]).toBeInstanceOf(PremiumMember);
+
+        window.alert.mockRestore();
+
+    });
+
+});

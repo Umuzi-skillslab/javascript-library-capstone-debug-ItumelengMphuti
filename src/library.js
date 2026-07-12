@@ -6,7 +6,7 @@ const MAX_DIGITAL_BOOKS_PER_MEMBER = 5;
 
 // Book class
 class Book {
-    constructor(isbn, title, author, year, copies, category) {
+    constructor(isbn, title, author, year, copies, category, type) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -14,6 +14,7 @@ class Book {
         this.availableCopies = copies;
         this.totalCopies = copies;
         this.category = category;
+        this.type = type;
         this.checkedOut = [];
         this.reservationQueue = [];
     }
@@ -73,7 +74,7 @@ class Book {
 class DigitalBook extends Book {
     constructor(isbn, title, author, year, fileSize, format, category) {
         // Missing: super() call with correct parameters
-        super(isbn, title, author, year, Infinity, category)
+        super(isbn, title, author, year, Infinity, category, "digital")
         this.fileSize = fileSize;
         this.format = format;
         this.downloads = 0;
@@ -283,7 +284,7 @@ function updateMemberInfo(member, updates) {
 }
 
 // Function with no error handling
-function borrowBook(memberId, isbn) {
+function borrowBook(memberId, isbn, bookType) {
     try {
         if (!memberId || !isbn) {
             return {

@@ -1,6 +1,7 @@
 {
   "books": [
     {
+      "type": "physical",
       "isbn": "978-0-7432-7356-5",
       "title": "Things Fall Apart",
       "author": "Chinua Achebe",
@@ -9,6 +10,7 @@
       "copies": 4
     },
     {
+      "type": "physical",
       "isbn": "978-0-7432-7357-2",
       "title": "Americanah",
       "author": "Chimamanda Ngozi Adichie",
@@ -17,6 +19,7 @@
       "copies": 3
     },
     {
+      "type": "physical",
       "isbn": "978-0-3856-6052-4",
       "title": "Sapiens: A Brief History of Humankind",
       "author": "Yuval Noah Harari",
@@ -25,6 +28,7 @@
       "copies": 5
     },
     {
+      "type": "physical",
       "isbn": "978-0-5957-4066-3",
       "title": "Long Walk to Freedom",
       "author": "Nelson Mandela",
@@ -33,6 +37,7 @@
       "copies": 4
     },
     {
+      "type": "physical",
       "isbn": "978-0-1403-2349-8",
       "title": "Half of a Yellow Sun",
       "author": "Chimamanda Ngozi Adichie",
@@ -41,6 +46,7 @@
       "copies": 3
     },
     {
+      "type": "physical",
       "isbn": "978-0-6709-1068-9",
       "title": "The Alchemist",
       "author": "Paulo Coelho",
@@ -49,6 +55,7 @@
       "copies": 6
     },
     {
+      "type": "physical",
       "isbn": "978-0-1410-3943-3",
       "title": "Educated",
       "author": "Tara Westover",
@@ -57,6 +64,7 @@
       "copies": 3
     },
     {
+      "type": "physical",
       "isbn": "978-0-3853-3348-1",
       "title": "Atomic Habits",
       "author": "James Clear",
@@ -65,6 +73,7 @@
       "copies": 5
     },
     {
+      "type": "physical",
       "isbn": "978-0-1412-8028-3",
       "title": "Purple Hibiscus",
       "author": "Chimamanda Ngozi Adichie",
@@ -73,6 +82,7 @@
       "copies": 2
     },
     {
+      "type": "physical",
       "isbn": "978-0-1930-3943-1",
       "title": "Introduction to Algorithms",
       "author": "Thomas H. Cormen",
@@ -81,6 +91,7 @@
       "copies": 3
     },
     {
+      "type": "physical",
       "isbn": "978-0-5960-0916-2",
       "title": "The Kite Runner",
       "author": "Khaled Hosseini",
@@ -89,6 +100,7 @@
       "copies": 4
     },
     {
+      "type": "physical",
       "isbn": "978-0-3854-7378-4",
       "title": "Thinking, Fast and Slow",
       "author": "Daniel Kahneman",
@@ -97,6 +109,7 @@
       "copies": 3
     },
     {
+      "type": "physical",
       "isbn": "978-0-1960-3943-7",
       "title": "Clean Code",
       "author": "Robert C. Martin",
@@ -105,20 +118,67 @@
       "copies": 4
     },
     {
+      "type": "Physical",
       "isbn": "978-0-7432-7358-9",
       "title": "A Grain of Wheat",
       "author": "Ngũgĩ wa Thiong'o",
       "year": 1967,
-      "category": "fiction",
+      "category": "Fiction",
       "copies": 2
     },
     {
+      "type": "Physical",
       "isbn": "978-0-2460-3943-5",
       "title": "The Oxford Dictionary of Computing",
       "author": "Andrew Butterfield",
       "year": 2016,
-      "category": "reference",
+      "category": "Reference",
       "copies": 2
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-3072-7748-3",
+      "title": "Becoming",
+      "author": "Michelle Obama",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 4
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-5533-8079-9",
+      "title": "The Silent Patient",
+      "author": "Alex Michaelides",
+      "year": 2019,
+      "category": "fiction",
+      "copies": 3
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-3215-6358-5",
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt",
+      "year": 1999,
+      "category": "reference",
+      "copies": 4
+    },
+    {
+      "type": "digital",
+      "isbn": "978-1-2503-0817-1",
+      "title": "The Midnight Library",
+      "author": "Matt Haig",
+      "year": 2020,
+      "category": "fiction",
+      "copies": 5
+    },
+    {
+      "type": "digital",
+      "isbn": "978-1-4919-1889-0",
+      "title": "JavaScript: The Definitive Guide",
+      "author": "David Flanagan",
+      "year": 2020,
+      "category": "reference",
+      "copies": 3
     }
   ]
 }

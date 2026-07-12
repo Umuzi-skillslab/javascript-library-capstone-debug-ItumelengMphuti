@@ -1,6 +1,7 @@
 // Library UI - DOM Manipulation with Complex Errors
 import {
     Book,
+    DigitalBook,
     Member,
     PremiumMember,
     books,
@@ -12,7 +13,9 @@ import {
 } from "./library.js";
 
 // Missing: proper initialization with DOMContentLoaded
-document.addEventListener("DOMContentLoaded", initializeUI);
+if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", initializeUI);
+}
 
 let catalogueContainer;
 let searchInput;
@@ -108,16 +111,31 @@ async function loadCatalogue() {
         books.length = 0;
 
         data.books.forEach(book => {
-            books.push(
-                new Book(
-                    book.isbn,
-                    book.title,
-                    book.author,
-                    book.year,
-                    book.copies,
-                    book.category
-                )
-            );
+            if (book.type === "Digital") {
+                books.push(
+                    new DigitalBook(
+                        book.isbn,
+                        book.title,
+                        book.author,
+                        book.year,
+                        book.category,
+                        book.fileSize,
+                        book.format
+                    )
+                );
+            } else {
+                books.push(
+                    new Book(
+                        book.isbn,
+                        book.title,
+                        book.author,
+                        book.year,
+                        book.copies,
+                        book.category,
+                        book.type
+                    )
+                );
+            }
         });
 
         renderBookCatalogue(books);
@@ -128,7 +146,14 @@ async function loadCatalogue() {
 }
 // Complex DOM rendering with errors
 function renderBookCatalogue(bookList) {
-    catalogueContainer.innerHTML = "";
+    const container =
+        catalogueContainer || document.getElementById("catalogue-list");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
 
     const fragment = document.createDocumentFragment();
 
@@ -138,52 +163,41 @@ function renderBookCatalogue(bookList) {
         bookCard.dataset.isbn = book.isbn;
 
         bookCard.innerHTML = `
-            <h3>${book.title}</h3>
-            <p><strong>Author:</strong> ${book.author}</p>
-            <p><strong>Category:</strong> ${book.category.charAt(0).toUpperCase() + book.category.slice(1)
+        <h3>${book.title}</h3>
+        <p><strong>Author:</strong> ${book.author}</p>
+        <p><strong>Type:</strong> ${book.type.charAt(0).toUpperCase() + book.type.slice(1)}</p>
+        <p><strong>Category:</strong> ${book.category.charAt(0).toUpperCase() + book.category.slice(1)}</p>
+        <p><strong>Available:</strong> ${book.type === "ebook" ? "Unlimited" : book.availableCopies
             }</p>
-
-            <p><strong>Available:</strong> ${book.availableCopies}</p>
         `;
 
         fragment.appendChild(bookCard);
     }
 
-    catalogueContainer.appendChild(fragment);
+    container.appendChild(fragment);
 }
 
 // Function with event handling errors
 function handleBorrowSubmit(event) {
     event.preventDefault();
 
-    const memberIdInput = document.getElementById("member-id");
-    const isbnInput = document.getElementById("isbn");
+    const memberId = document.getElementById("member-id").value.trim();
+    const isbn = document.getElementById("isbn").value.trim();
 
-    const memberId = memberIdInput.value.trim();
-    const isbn = isbnInput.value.trim();
-
-    // Input validation
     if (!memberId || !isbn) {
         alert("Please enter both Member ID and ISBN.");
         return;
     }
 
     try {
-        const success = borrowBook(memberId, isbn);
+        const result = borrowBook(memberId, isbn);
 
-        if (success) {
-            alert("Book borrowed successfully!");
+        alert(result.message);
 
-            // Clear the form
+        if (result.success) {
             event.target.reset();
-
-            // Refresh the catalogue so available copies update
             renderBookCatalogue(books);
-
-            // Refresh statistics if you have them
             updateStatisticsDisplay();
-        } else {
-            alert("Unable to borrow the book.");
         }
 
     } catch (error) {
@@ -208,7 +222,10 @@ function handleBookClick(event) {
 function handleSearch(event) {
     const searchTerm = event.target.value.trim().toLowerCase();
 
-    const results = books.filter(book => book.title.toLowerCase().includes(searchTerm));
+    const results = books.filter(book =>
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm)
+    );
 
     renderBookCatalogue(results);
 }
@@ -314,13 +331,18 @@ function displayBookDetails(isbn) {
 
     const detailsContainer = document.getElementById("book-details");
 
+    if (!detailsContainer) {
+        return;
+    }
+
     detailsContainer.innerHTML = `
         <div class="book-details">
             <h2>${book.title}</h2>
             <p><strong>Author:</strong> ${book.author}</p>
             <p><strong>ISBN:</strong> ${book.isbn}</p>
             <p><strong>Year:</strong> ${book.year}</p>
-            <p><strong>Category:</strong> ${book.category}</p>
+            <p><strong>Type:</strong> ${book.type.charAt(0).toUpperCase() + book.type.slice(1)}</p>
+            <p><strong>Category:</strong> ${book.category.charAt(0).toUpperCase() + book.category.slice(1)}</p>
             <p><strong>Available Copies:</strong> ${book.availableCopies}</p>
             <p><strong>Total Copies:</strong> ${book.totalCopies}</p>
         </div>
@@ -464,14 +486,28 @@ function createMemberForm() {
         alert(
             `Member added successfully!
 
-Member ID: ${member.id}
-Name: ${member.name}
-Email: ${member.email}
-Membership: ${member.membershipType}
-Join Date: ${member.joinDate}`
+        Member ID: ${member.id}
+        Name: ${member.name}
+        Email: ${member.email}
+        Membership: ${member.membershipType}
+        Join Date: ${member.joinDate}`
         );
 
         // Reset the form
         form.reset();
     });
 }
+
+export {
+    renderBookCatalogue,
+    handleSearch,
+    displayBookDetails,
+    handleBorrowSubmit,
+    handleFilterChange,
+    updateStatisticsDisplay,
+    createMemberForm,
+    exportLibraryData,
+    importLibraryData,
+    saveToLocalStorage,
+    loadFromLocalStorage
+};
