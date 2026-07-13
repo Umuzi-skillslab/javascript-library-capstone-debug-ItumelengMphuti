@@ -280,21 +280,75 @@ Queries `#total-books`, `#total-members`, and `#books-borrowed` by ID and update
 
 ## Screenshots
 
-Add the following screenshots to a `screenshots/` folder before submission:
+### Application Running
 
-- `screenshots/app-running.png` — Application open in browser with books displayed in the catalogue
-- `screenshots/console-clean.png` — Browser DevTools console showing **no JavaScript errors**
-- `screenshots/jest-passing.png` — Terminal output showing **117 tests passing** across all test suites
-- `screenshots/coverage-report.png` — Coverage report showing **>80%** across statements, branches, functions, and lines
-- `screenshots/search-working.png` — Catalogue filtered in real time by a search term
-- `screenshots/borrow-book.png` — Successful borrow book
-- `screenshots/book-borrowed.png` — Successful borrow with the `#borrow-feedback` success message displayed
-- `screenshots/statistics-working.png` — Statistics section showing correct live counts after a borrow transaction
-- `screenshots/member-creation.png` — Member form completed
-- `screenshots/member-created.png` — Member form completed and new member appearing in the member list
-- `screenshots/book-details.png` — Book details panel populated after clicking a catalogue card
+The application running in the browser with books displayed in the catalogue.
+
+![Application Running](screenshots/app-running.png)
+
+### Console Verification
+
+Browser DevTools console showing no JavaScript errors.
+
+![Clean Console](screenshots/console-clean.png)
+
+### Testing and Coverage
+
+Jest test results showing all test suites passing.
+
+![Jest Passing](screenshots/jest-passing.png)
+
+Coverage report showing more than 80% coverage across statements, branches, functions, and lines.
+
+![Coverage Report](screenshots/coverage-report.png)
 
 ---
+
+## Core Features
+
+### Search Functionality
+
+Catalogue filtered in real time using a search term.
+
+![Search Working](screenshots/search-working.png)
+
+### Borrowing Books
+
+Successful borrow book transaction.
+
+![Borrow Book](screenshots/borrow-book.png)
+
+Successful borrow transaction displaying the borrow feedback success message.
+
+![Book Borrowed Feedback](screenshots/book-borrowed.png)
+
+### Library Statistics
+
+Statistics section showing updated live counts after a borrow transaction.
+
+![Statistics Working](screenshots/statistics-working.png)
+
+---
+
+## Member Management
+
+### Creating a Member
+
+Member form completed before submission.
+
+![Member Creation Form](screenshots/member-creation.png)
+
+New member successfully created and displayed in the member list.
+
+![Member Created](screenshots/member-created.png)
+
+---
+
+## Book Details
+
+Book details panel populated after selecting a catalogue card.
+
+![Book Details](screenshots/book-details.png)
 
 ## Reflection
 
