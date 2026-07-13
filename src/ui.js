@@ -7,6 +7,7 @@ import {
     books,
     members,
     borrowBook,
+    returnBook,
     findBookByISBN,
     searchBooksByCategory,
     LibraryStats
@@ -31,15 +32,14 @@ function initializeUI() {
 
     // Missing: null checks
     if (!catalogueContainer || !searchInput || !filterDropdown) {
-        console.error("UI elements not found.");
-        return;
-    }
+    console.error("UI elements not found.");
+    return;
+}
 
     setupEventListeners();
     loadCatalogue();
     createMemberForm();
     renderMemberList();
-    updateStatisticsDisplay();
 }
 
 function setupEventListeners() {
@@ -51,6 +51,12 @@ function setupEventListeners() {
     if (borrowForm) {
         borrowForm.addEventListener("submit", handleBorrowSubmit);
     }
+
+    const returnForm = document.getElementById("return-form");
+
+if (returnForm) {
+    returnForm.addEventListener("submit", handleReturnSubmit);
+}
 
     catalogueContainer.addEventListener("click", handleBookClick);
 
@@ -69,38 +75,36 @@ function setupEventListeners() {
 }
 
 function showSection(section) {
-    const catalogue = document.getElementById("catalogue-section");
-    const borrowSection = document.getElementById("borrow-section");
-    const members = document.getElementById("member-section");
-    const statistics = document.getElementById("statistics-section");
 
-    // Hide everything first
-    catalogue.classList.add("hidden");
-    borrowSection.classList.add("hidden");
-    members.classList.add("hidden");
-    statistics.classList.add("hidden");
+    // Hide all sections
+    document.getElementById("catalogue-section").classList.add("hidden");
+    document.getElementById("borrow-section").classList.add("hidden");
+    document.getElementById("return-section").classList.add("hidden");
+    document.getElementById("member-section").classList.add("hidden");
+    document.getElementById("statistics-section").classList.add("hidden");
 
-    // Reset the tabs
+    // Reset active tab
     document.getElementById("catalogue-tab").setAttribute("aria-selected", "false");
     document.getElementById("members-tab").setAttribute("aria-selected", "false");
     document.getElementById("statistics-tab").setAttribute("aria-selected", "false");
 
     switch (section) {
+
         case "catalogue":
-            catalogue.classList.remove("hidden");
-            borrowSection.classList.remove("hidden");
+            document.getElementById("catalogue-section").classList.remove("hidden");
+            document.getElementById("borrow-section").classList.remove("hidden");
+            document.getElementById("return-section").classList.remove("hidden");
             document.getElementById("catalogue-tab").setAttribute("aria-selected", "true");
             break;
 
         case "members":
-            members.classList.remove("hidden");
+            document.getElementById("member-section").classList.remove("hidden");
             document.getElementById("members-tab").setAttribute("aria-selected", "true");
             break;
 
         case "statistics":
-            statistics.classList.remove("hidden");
+            document.getElementById("statistics-section").classList.remove("hidden");
             document.getElementById("statistics-tab").setAttribute("aria-selected", "true");
-            updateStatisticsDisplay();
             break;
     }
 }
@@ -141,6 +145,7 @@ async function loadCatalogue() {
         });
 
         renderBookCatalogue(books);
+        updateStatisticsDisplay();
 
     } catch (error) {
         console.error(error);
@@ -181,37 +186,71 @@ function renderBookCatalogue(bookList) {
 
 // Function with event handling errors
 function handleBorrowSubmit(event) {
+    console.log("Borrow form submitted");
+
     event.preventDefault();
 
     const memberId = document.getElementById("member-id").value.trim();
     const isbn = document.getElementById("isbn").value.trim();
 
+    console.log("Member:", memberId);
+    console.log("ISBN:", isbn);
+
+    const result = borrowBook(memberId, isbn);
+
+    console.log("Borrow result:", result);
+
+    showMessage(
+        result.message,
+        result.success ? "success" : "error",
+        "borrow-feedback"
+    );
+
+    if (result.success) {
+        event.target.reset();
+        renderBookCatalogue(books);
+        displayBookDetails(isbn);
+        updateStatisticsDisplay();
+
+    }
+}
+
+function handleReturnSubmit(event) {
+    event.preventDefault();
+
+    const memberId = document
+        .getElementById("return-member-id")
+        .value
+        .trim();
+
+    const isbn = document
+        .getElementById("return-isbn")
+        .value
+        .trim();
+
     if (!memberId || !isbn) {
-        showMessage("Please enter both Member ID and ISBN.",
-            "error"
+        showMessage(
+            "Please enter both Member ID and ISBN.",
+            "error",
+            "return-feedback"
         );
         return;
     }
 
-    try {
-        const result = borrowBook(memberId, isbn);
+    const result = returnBook(memberId, isbn);
 
-showMessage(
-    result.message,
-    result.success ? "success" : "error"
-);
+    showMessage(
+        result.message,
+        result.success ? "success" : "error",
+        "return-feedback"
+    );
 
-if (result.success) {
-    event.target.reset();
-    renderBookCatalogue(books);
-    updateStatisticsDisplay();
-}
+    if (result.success) {
+        event.target.reset();
 
-    } catch (error) {
-        console.error(error);
-        showMessage(
-            "An unexpected error occurred.",
-            "error");
+        renderBookCatalogue(books);
+        displayBookDetails(isbn);
+        updateStatisticsDisplay();
     }
 }
 
@@ -364,6 +403,7 @@ function displayBookDetails(isbn) {
 
 // Statistics display with errors
 function updateStatisticsDisplay() {
+
     const totalBooksEl = document.getElementById("total-books");
     const totalMembersEl = document.getElementById("total-members");
     const booksBorrowedEl = document.getElementById("books-borrowed");
@@ -373,6 +413,10 @@ function updateStatisticsDisplay() {
     }
 
     LibraryStats.updateStats();
+
+console.log("Books length:", books.length);
+console.log("Stats object:", LibraryStats);
+console.log("Stats from getter:", LibraryStats.getStatistics());
 
     totalBooksEl.textContent = LibraryStats.totalBooks;
     totalMembersEl.textContent = LibraryStats.totalMembers;
@@ -523,6 +567,8 @@ export {
     loadCatalogue,
     handleBorrowSubmit,
     handleFilterChange,
+    returnBook,
+    handleReturnSubmit,
     updateStatisticsDisplay,
     createMemberForm,
     exportLibraryData,

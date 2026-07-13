@@ -36,6 +36,8 @@ import {
     displayBookDetails,
     handleBorrowSubmit,
     handleFilterChange,
+    returnBook,
+    handleReturnSubmit,
     updateStatisticsDisplay,
     createMemberForm,
     exportLibraryData,
@@ -1972,19 +1974,19 @@ describe("handleBorrowSubmit", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
-            <div id="message-box" class="hidden"></div>
+    <form id="borrow-form">
+        <div id="borrow-feedback" class="hidden"></div>
 
-            <form id="borrow-form">
-                <input id="member-id">
-                <input id="isbn">
+        <input id="member-id">
+        <input id="isbn">
 
-                <div id="catalogue-list"></div>
+        <div id="catalogue-list"></div>
 
-                <p id="total-books"></p>
-                <p id="total-members"></p>
-                <p id="books-borrowed"></p>
-            </form>
-        `;
+        <p id="total-books"></p>
+        <p id="total-members"></p>
+        <p id="books-borrowed"></p>
+    </form>
+`;
 
         books.length = 0;
         members.length = 0;
@@ -2033,10 +2035,10 @@ describe("handleBorrowSubmit", () => {
 
         handleBorrowSubmit(event);
 
-        const messageBox = document.getElementById("message-box");
+        const messageBox = document.getElementById("borrow-feedback");
 
         expect(messageBox.textContent)
-            .toBe("Please enter both Member ID and ISBN.");
+            .toBe("Please enter both a Member ID and an ISBN.");
 
         expect(messageBox.className)
             .toContain("error");
@@ -2055,7 +2057,7 @@ describe("handleBorrowSubmit", () => {
 
         handleBorrowSubmit(event);
 
-        const messageBox = document.getElementById("message-box");
+        const messageBox = document.getElementById("borrow-feedback");
 
         expect(messageBox.textContent)
             .toBe("Member '999' does not exist.");
@@ -2077,7 +2079,7 @@ describe("handleBorrowSubmit", () => {
 
         handleBorrowSubmit(event);
 
-        const messageBox = document.getElementById("message-box");
+        const messageBox = document.getElementById("borrow-feedback");
 
         expect(messageBox.textContent)
             .toBe("Book with ISBN '999' was not found.");
@@ -2099,7 +2101,7 @@ describe("handleBorrowSubmit", () => {
 
         handleBorrowSubmit(event);
 
-        const messageBox = document.getElementById("message-box");
+        const messageBox = document.getElementById("borrow-feedback");
 
         expect(messageBox.textContent)
             .toBe("\"Test Book\" has been borrowed successfully.");
@@ -2344,6 +2346,184 @@ describe("createMemberForm", () => {
             .toContain("Membership: premium");
 
         expect(messageBox.className)
+            .toContain("success");
+
+    });
+
+});
+
+describe("returnBook", () => {
+
+    beforeEach(() => {
+        books.length = 0;
+        members.length = 0;
+
+        const book = new Book(
+            "123",
+            "Test Book",
+            "Author",
+            2024,
+            2,
+            "fiction",
+            "physical"
+        );
+
+        const member = new Member(
+            "001",
+            "John",
+            "john@test.com",
+            "standard"
+        );
+
+        books.push(book);
+        members.push(member);
+
+        // Simulate a borrowed book
+        book.checkOut(member.id);
+        member.borrowedBooks.push(book.isbn);
+    });
+
+    test("should successfully return a borrowed book", () => {
+
+        const result = returnBook("001", "123");
+
+        expect(result.success).toBe(true);
+        expect(result.message)
+            .toBe("\"Test Book\" has been returned successfully.");
+
+        expect(books[0].availableCopies).toBe(2);
+        expect(books[0].checkedOut.length).toBe(0);
+        expect(members[0].borrowedBooks).toEqual([]);
+
+    });
+
+    test("should fail when member does not exist", () => {
+
+        const result = returnBook("999", "123");
+
+        expect(result.success).toBe(false);
+        expect(result.message)
+            .toBe("Member '999' does not exist.");
+
+    });
+
+    test("should fail when book does not exist", () => {
+
+        const result = returnBook("001", "999");
+
+        expect(result.success).toBe(false);
+        expect(result.message)
+            .toBe("Book with ISBN '999' was not found.");
+
+    });
+
+    test("should fail if member never borrowed the book", () => {
+
+        books[0].returnBook("001");
+
+        const result = returnBook("001", "123");
+
+        expect(result.success).toBe(false);
+        expect(result.message)
+            .toBe("This member has not borrowed this book.");
+    });
+});
+
+describe("handleReturnSubmit", () => {
+
+    beforeEach(() => {
+
+        document.body.innerHTML = `
+            <div id="return-feedback"></div>
+
+            <form id="return-form">
+                <input id="return-member-id">
+                <input id="return-isbn">
+            </form>
+
+            <div id="catalogue-list"></div>
+            <div id="book-details"></div>
+
+            <p id="total-books"></p>
+            <p id="total-members"></p>
+            <p id="books-borrowed"></p>
+        `;
+
+        books.length = 0;
+        members.length = 0;
+
+        const book = new Book(
+            "123",
+            "Test Book",
+            "Author",
+            2024,
+            2,
+            "fiction",
+            "physical"
+        );
+
+        const member = new Member(
+            "001",
+            "John",
+            "john@test.com",
+            "standard"
+        );
+
+        books.push(book);
+        members.push(member);
+
+        book.checkOut(member.id);
+        member.borrowedBooks.push(book.isbn);
+
+    });
+
+    test("should call preventDefault", () => {
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("return-form")
+        };
+
+        handleReturnSubmit(event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+
+    });
+
+    test("should show validation message when inputs are empty", () => {
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("return-form")
+        };
+
+        handleReturnSubmit(event);
+
+        const feedback = document.getElementById("return-feedback");
+
+        expect(feedback.textContent)
+            .toBe("Please enter both Member ID and ISBN.");
+
+    });
+
+    test("should return a borrowed book", () => {
+
+        document.getElementById("return-member-id").value = "001";
+        document.getElementById("return-isbn").value = "123";
+
+        const event = {
+            preventDefault: jest.fn(),
+            target: document.getElementById("return-form")
+        };
+
+        handleReturnSubmit(event);
+
+        const feedback = document.getElementById("return-feedback");
+
+        expect(feedback.textContent)
+            .toBe("\"Test Book\" has been returned successfully.");
+
+        expect(feedback.className)
             .toContain("success");
 
     });

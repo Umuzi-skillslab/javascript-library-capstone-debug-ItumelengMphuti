@@ -358,6 +358,65 @@ function borrowBook(memberId, isbn, bookType) {
     }
 }
 
+function returnBook(memberId, isbn) {
+
+    try {
+
+        if (!memberId || !isbn) {
+            return {
+                success: false,
+                message: "Please enter both a Member ID and an ISBN."
+            };
+        }
+
+        const member = findMemberById(memberId);
+
+        if (!member) {
+            return {
+                success: false,
+                message: `Member '${memberId}' does not exist.`
+            };
+        }
+
+        const book = findBookByISBN(isbn);
+
+        if (!book) {
+            return {
+                success: false,
+                message: `Book with ISBN '${isbn}' was not found.`
+            };
+        }
+
+        const returned = book.returnBook(memberId);
+
+        if (!returned) {
+            return {
+                success: false,
+                message: "This member has not borrowed this book."
+            };
+        }
+
+        const borrowedIndex = member.borrowedBooks.indexOf(isbn);
+
+        if (borrowedIndex !== -1) {
+            member.borrowedBooks.splice(borrowedIndex, 1);
+        }
+
+        return {
+            success: true,
+            message: `"${book.title}" has been returned successfully.`
+        };
+
+    } catch (error) {
+
+        return {
+            success: false,
+            message: error.message
+        };
+
+    }
+}
+
 function findMemberById(id) {
     return members.find(member => member.id === id) || null;
 }
@@ -372,14 +431,20 @@ const LibraryStats = {
     totalMembers: 0,
     totalBorrowings: 0,
 
-    updateStats() {
-        this.totalBooks = books.length;
-        this.totalMembers = members.length;
-        this.totalBorrowings = books.reduce(
-    (total, book) => total + book.checkedOut.length,
-    0
-);
-    },
+   updateStats() {
+    console.log("updateStats() is running");
+
+    this.totalBooks = books.length;
+    this.totalMembers = members.length;
+    this.totalBorrowings = books.reduce(
+        (total, book) => total + book.checkedOut.length,
+        0
+    );
+
+    console.log(this.totalBooks);
+    console.log(this.totalMembers);
+    console.log(this.totalBorrowings);
+},
 
     getAverageBorrowings() {
         if (this.totalMembers === 0) {
@@ -464,6 +529,7 @@ export {
     addMultipleBooks,
     updateMemberInfo,
     borrowBook,
+    returnBook,
     findMemberById,
     findBookByISBN,
     LibraryStats,
