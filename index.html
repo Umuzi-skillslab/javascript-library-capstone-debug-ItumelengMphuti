@@ -79,8 +79,8 @@
           </div>
           <div id="book-details" aria-live="polite" aria-label="Book details">
             <!-- Selected book details -->
-             <h3>Book Details</h3>
-    <p>Select a book to see more information.</p>
+            <h3>Book Details</h3>
+            <p>Select a book to see more information.</p>
           </div>
           <!-- aria-live so screen readers announce updates to the book list -->
           <div
@@ -129,36 +129,25 @@
         </section>
 
         <section id="return-section">
-    <h2>Return a Book</h2>
+          <h2>Return a Book</h2>
 
-    <form id="return-form" novalidate>
+          <form id="return-form" novalidate>
+            <div id="return-feedback" role="alert" aria-live="assertive"></div>
 
-        <div
-            id="return-feedback"
-            role="alert"
-            aria-live="assertive">
-        </div>
+            <label for="return-member-id">Member ID</label>
+            <input
+              type="text"
+              id="return-member-id"
+              placeholder="Member ID"
+              required
+            />
 
-        <label for="return-member-id">Member ID</label>
-        <input
-            type="text"
-            id="return-member-id"
-            placeholder="Member ID"
-            required
-        >
+            <label for="return-isbn">ISBN</label>
+            <input type="text" id="return-isbn" placeholder="ISBN" required />
 
-        <label for="return-isbn">ISBN</label>
-        <input
-            type="text"
-            id="return-isbn"
-            placeholder="ISBN"
-            required
-        >
-
-        <button type="submit">Return Book</button>
-
-    </form>
-</section>
+            <button type="submit">Return Book</button>
+          </form>
+        </section>
 
         <section
           id="member-section"

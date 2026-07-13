@@ -5,20 +5,20 @@
 *,
 *::before,
 *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fb;
-    color: #333;
-    line-height: 1.6;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fb;
+  color: #333;
+  line-height: 1.6;
 }
 
 /* ===========================
@@ -26,9 +26,9 @@ body {
 =========================== */
 
 .container {
-    width: min(1200px, 92%);
-    margin: auto;
-    padding: 2rem 0;
+  width: min(1200px, 92%);
+  margin: auto;
+  padding: 2rem 0;
 }
 
 /* ===========================
@@ -36,21 +36,21 @@ body {
 =========================== */
 
 header {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 header h1 {
-    color: #2563eb;
-    font-size: 2rem;
+  color: #2563eb;
+  font-size: 2rem;
 }
 
 /* ===========================
@@ -58,28 +58,28 @@ header h1 {
 =========================== */
 
 nav div {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 nav button {
-    border: none;
-    background: #e5e7eb;
-    color: #444;
+  border: none;
+  background: #e5e7eb;
+  color: #444;
 
-    padding: .8rem 1.5rem;
+  padding: 0.8rem 1.5rem;
 
-    border-radius: 8px;
+  border-radius: 8px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: .25s;
+  transition: 0.25s;
 }
 
 nav button:hover,
 nav button:focus {
-    background: #2563eb;
-    color: white;
+  background: #2563eb;
+  color: white;
 }
 
 /* button[aria-selected="true"] {
@@ -92,24 +92,24 @@ nav button:focus {
 =========================== */
 
 section {
-    background: white;
+  background: white;
 
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 
-    padding: 2rem;
+  padding: 2rem;
 
-    border-radius: 12px;
+  border-radius: 12px;
 
-    box-shadow: 0 5px 15px rgba(0,0,0,.06);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 section h2 {
-    color: #2563eb;
-    margin-bottom: 1.5rem;
+  color: #2563eb;
+  margin-bottom: 1.5rem;
 }
 
 /* ===========================
@@ -117,46 +117,43 @@ section h2 {
 =========================== */
 
 .controls {
-    display: grid;
+  display: grid;
 
-    grid-template-columns:
-        repeat(auto-fit, minmax(250px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 
-    gap: 1rem;
+  gap: 1rem;
 
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 label {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 input,
 select {
+  width: 100%;
 
-    width: 100%;
+  padding: 0.85rem;
 
-    padding: .85rem;
+  border: 1px solid #d1d5db;
 
-    border: 1px solid #d1d5db;
+  border-radius: 8px;
 
-    border-radius: 8px;
+  font-size: 1rem;
 
-    font-size: 1rem;
+  margin-top: 0.35rem;
 
-    margin-top: .35rem;
-
-    transition: .25s;
+  transition: 0.25s;
 }
 
 input:focus,
 select:focus {
+  outline: none;
 
-    outline: none;
+  border-color: #2563eb;
 
-    border-color: #2563eb;
-
-    box-shadow: 0 0 0 3px rgba(37,99,235,.2);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 /* ===========================
@@ -164,42 +161,37 @@ select:focus {
 =========================== */
 
 .book-grid {
+  display: grid;
 
-    display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 
-    grid-template-columns:
-        repeat(auto-fill,minmax(250px,1fr));
+  gap: 1.5rem;
 
-    gap: 1.5rem;
-
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 .book-card {
+  background: white;
 
-    background: white;
+  border: 1px solid #e5e7eb;
 
-    border: 1px solid #e5e7eb;
+  border-radius: 10px;
 
-    border-radius: 10px;
+  padding: 1rem;
 
-    padding: 1rem;
-
-    transition: .3s;
+  transition: 0.3s;
 }
 
 .book-card:hover {
+  transform: translateY(-4px);
 
-    transform: translateY(-4px);
-
-    box-shadow: 0 8px 18px rgba(0,0,0,.1);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
 }
 
 .book-card h3 {
+  color: #2563eb;
 
-    color: #2563eb;
-
-    margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* ===========================
@@ -207,54 +199,49 @@ select:focus {
 =========================== */
 
 #book-details {
+  margin-top: 2rem;
 
-    margin-top: 2rem;
+  padding: 1.5rem;
 
-    padding: 1.5rem;
+  background: #f9fafb;
 
-    background: #f9fafb;
+  border-left: 5px solid #2563eb;
 
-    border-left: 5px solid #2563eb;
-
-    border-radius: 8px;
+  border-radius: 8px;
 }
-
 
 /* ===========================
    FORM
 =========================== */
 
 form {
+  display: flex;
 
-    display: flex;
+  flex-direction: column;
 
-    flex-direction: column;
-
-    gap: 1rem;
+  gap: 1rem;
 }
 
 form button {
+  align-self: flex-start;
 
-    align-self: flex-start;
+  border: none;
 
-    border: none;
+  background: #2563eb;
 
-    background: #2563eb;
+  color: white;
 
-    color: white;
+  padding: 0.9rem 2rem;
 
-    padding: .9rem 2rem;
+  border-radius: 8px;
 
-    border-radius: 8px;
+  cursor: pointer;
 
-    cursor: pointer;
-
-    transition: .25s;
+  transition: 0.25s;
 }
 
 form button:hover {
-
-    background: #1d4ed8;
+  background: #1d4ed8;
 }
 
 /* ===========================
@@ -262,12 +249,11 @@ form button:hover {
 =========================== */
 
 #borrow-feedback {
+  color: crimson;
 
-    color: crimson;
+  font-weight: bold;
 
-    font-weight: bold;
-
-    min-height: 20px;
+  min-height: 20px;
 }
 
 /* ===========================
@@ -275,8 +261,7 @@ form button:hover {
 =========================== */
 
 #member-list {
-
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 /* ===========================
@@ -284,79 +269,69 @@ form button:hover {
 =========================== */
 
 .stats-grid {
+  display: grid;
 
-    display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 
-    grid-template-columns:
-        repeat(auto-fit,minmax(220px,1fr));
-
-    gap: 1.5rem;
+  gap: 1.5rem;
 }
 
 .stat-card {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
 
-    background: linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
+  color: white;
 
-    color: white;
+  border-radius: 10px;
 
-    border-radius: 10px;
+  padding: 2rem;
 
-    padding: 2rem;
+  text-align: center;
 
-    text-align: center;
-
-    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card h3 {
-
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .stat-card p {
+  font-size: 2.5rem;
 
-    font-size: 2.5rem;
-
-    font-weight: bold;
+  font-weight: bold;
 }
-
 
 /* ============================
      HELPER FUNTION
 =========================== */
 
 #message-box {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: opacity 0.3s ease;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
 }
 
 #message-box.hidden {
-    display: none;
+  display: none;
 }
 
 #message-box.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #28a745;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #28a745;
 }
 
 #message-box.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #dc3545;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #dc3545;
 }
 
 #message-box.info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #17a2b8;
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #17a2b8;
 }
 
 /* ===========================
@@ -366,10 +341,9 @@ form button:hover {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
+  outline: 3px solid #f59e0b;
 
-    outline: 3px solid #f59e0b;
-
-    outline-offset: 2px;
+  outline-offset: 2px;
 }
 
 /* ===========================
@@ -377,25 +351,21 @@ select:focus-visible {
 =========================== */
 
 @media (max-width: 768px) {
+  header {
+    flex-direction: column;
 
-    header {
+    gap: 1rem;
 
-        flex-direction: column;
+    text-align: center;
+  }
 
-        gap: 1rem;
+  nav div {
+    flex-wrap: wrap;
 
-        text-align: center;
-    }
+    justify-content: center;
+  }
 
-    nav div {
-
-        flex-wrap: wrap;
-
-        justify-content: center;
-    }
-
-    form button {
-
-        width: 100%;
-    }
+  form button {
+    width: 100%;
+  }
 }

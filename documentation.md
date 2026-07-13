@@ -17,63 +17,72 @@ The application supports both **physical books** and **digital books**, member m
 
 The following bugs were identified and corrected during development.
 
-| # | File | Error | Severity |
-|---|------|-------|----------|
-| 1 | ui.js | `initializeUI()` called as a bare function call before the DOM has finished parsing — every `querySelector` returns null | High |
-| 2 | ui.js | No null checks after any DOM query — any missing element causes an immediate `TypeError` that breaks the entire UI | High |
-| 3 | library.js | `books = []` assigned without a declaration keyword — creates an implicit global and throws a `ReferenceError` in strict mode | High |
-| 4 | library.js | `MAX_BOOKS_PER_MEMBER = 5` assigned without `const` — implicit global, not enforced as a constant | High |
-| 5 | library.js | `DigitalBook` constructor accesses `this.fileSize` before calling `super()` — throws `ReferenceError` at runtime | High |
-| 6 | library.js | Constructor parameter order mismatch between `Book` and `DigitalBook` — properties assigned to wrong fields on instantiation | High |
-| 7 | library.js | `canBorrow()` uses assignment `=` instead of `===` — condition always evaluates as truthy, borrow limit never enforced | High |
-| 8 | library.js | `findMemberById()` uses `=` instead of `===` — always returns the first member regardless of ID passed | High |
-| 9 | library.js | `searchBooksByCategory()` uses `=` instead of `===` — overwrites every book's category property on each call | High |
-| 10 | library.js | `searchBooksByCategory()` has no base case — recursive function always causes a stack overflow | High |
-| 11 | library.js | `processReturnQueue()` never increments the loop index — infinite loop that hangs the browser tab | High |
-| 12 | library.js | `borrowBook()` calls `member.canBorrow()` with no null guard — crashes with `TypeError` when member or book is not found | High |
-| 13 | ui.js | `filterDropdown` selector written as `"filter-category"` without `#` — targets a non-existent HTML element, returns null | High |
-| 14 | ui.js | `handleBorrowSubmit` missing `event.preventDefault()` — form submission triggers a full page reload, wiping all state | High |
-| 15 | ui.js | `saveToLocalStorage` missing `JSON.stringify` — arrays stored as `[object Object]`, unreadable on retrieval | High |
-| 16 | ui.js | `loadFromLocalStorage` missing `JSON.parse` — raw strings assigned to `books` and `members`, breaking all array operations | High |
-| 17 | ui.js | `importLibraryData` has no try-catch around `JSON.parse` — any malformed input throws an uncaught `SyntaxError` | High |
-| 18 | ui.js | `renderBookCatalogue` never clears the container before rendering — repeated calls stack results on top of each other | Medium |
-| 19 | ui.js | `filterDropdown` uses `"click"` event instead of `"change"` — filter handler fires on focus, not on selection | Medium |
-| 20 | ui.js | Search input has no registered event listener — the search field has no effect on the catalogue | Medium |
-| 21 | ui.js | `displayBookDetails` has no null check after `findBookByISBN` — crashes when an unrecognised ISBN is passed | Medium |
-| 22 | ui.js | `updateStatisticsDisplay` targets elements by class instead of ID — selects wrong elements once IDs are corrected in HTML | Medium |
-| 23 | ui.js | `handleFilterChange` does not handle the `"all"` option — selecting All Categories returns an empty list | Low |
-| 24 | html | Tab navigation buttons have no ARIA roles — screen readers cannot identify or operate the tab pattern | High |
-| 25 | html | All form inputs missing `<label>` elements — fails WCAG 1.3.1 and 3.3.2, placeholder text is not a label substitute | High |
+| #   | File       | Error                                                                                                                         | Severity |
+| --- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- | -------- |
+| 1   | ui.js      | `initializeUI()` called as a bare function call before the DOM has finished parsing — every `querySelector` returns null      | High     |
+| 2   | ui.js      | No null checks after any DOM query — any missing element causes an immediate `TypeError` that breaks the entire UI            | High     |
+| 3   | library.js | `books = []` assigned without a declaration keyword — creates an implicit global and throws a `ReferenceError` in strict mode | High     |
+| 4   | library.js | `MAX_BOOKS_PER_MEMBER = 5` assigned without `const` — implicit global, not enforced as a constant                             | High     |
+| 5   | library.js | `DigitalBook` constructor accesses `this.fileSize` before calling `super()` — throws `ReferenceError` at runtime              | High     |
+| 6   | library.js | Constructor parameter order mismatch between `Book` and `DigitalBook` — properties assigned to wrong fields on instantiation  | High     |
+| 7   | library.js | `canBorrow()` uses assignment `=` instead of `===` — condition always evaluates as truthy, borrow limit never enforced        | High     |
+| 8   | library.js | `findMemberById()` uses `=` instead of `===` — always returns the first member regardless of ID passed                        | High     |
+| 9   | library.js | `searchBooksByCategory()` uses `=` instead of `===` — overwrites every book's category property on each call                  | High     |
+| 10  | library.js | `searchBooksByCategory()` has no base case — recursive function always causes a stack overflow                                | High     |
+| 11  | library.js | `processReturnQueue()` never increments the loop index — infinite loop that hangs the browser tab                             | High     |
+| 12  | library.js | `borrowBook()` calls `member.canBorrow()` with no null guard — crashes with `TypeError` when member or book is not found      | High     |
+| 13  | ui.js      | `filterDropdown` selector written as `"filter-category"` without `#` — targets a non-existent HTML element, returns null      | High     |
+| 14  | ui.js      | `handleBorrowSubmit` missing `event.preventDefault()` — form submission triggers a full page reload, wiping all state         | High     |
+| 15  | ui.js      | `saveToLocalStorage` missing `JSON.stringify` — arrays stored as `[object Object]`, unreadable on retrieval                   | High     |
+| 16  | ui.js      | `loadFromLocalStorage` missing `JSON.parse` — raw strings assigned to `books` and `members`, breaking all array operations    | High     |
+| 17  | ui.js      | `importLibraryData` has no try-catch around `JSON.parse` — any malformed input throws an uncaught `SyntaxError`               | High     |
+| 18  | ui.js      | `renderBookCatalogue` never clears the container before rendering — repeated calls stack results on top of each other         | Medium   |
+| 19  | ui.js      | `filterDropdown` uses `"click"` event instead of `"change"` — filter handler fires on focus, not on selection                 | Medium   |
+| 20  | ui.js      | Search input has no registered event listener — the search field has no effect on the catalogue                               | Medium   |
+| 21  | ui.js      | `displayBookDetails` has no null check after `findBookByISBN` — crashes when an unrecognised ISBN is passed                   | Medium   |
+| 22  | ui.js      | `updateStatisticsDisplay` targets elements by class instead of ID — selects wrong elements once IDs are corrected in HTML     | Medium   |
+| 23  | ui.js      | `handleFilterChange` does not handle the `"all"` option — selecting All Categories returns an empty list                      | Low      |
+| 24  | html       | Tab navigation buttons have no ARIA roles — screen readers cannot identify or operate the tab pattern                         | High     |
+| 25  | html       | All form inputs missing `<label>` elements — fails WCAG 1.3.1 and 3.3.2, placeholder text is not a label substitute           | High     |
 
 ---
 
 ## Fixes Implemented
 
 ### DOM Initialisation
+
 `initializeUI()` was moved inside a `DOMContentLoaded` event listener so that no DOM queries run until the browser has finished building the document tree. Before this fix, every `querySelector` and `getElementById` call returned `null` because they executed while the `<body>` was still being parsed, causing the entire UI to fail silently on load.
 
 ### Null Checks and Error Handling
+
 Null guards were added after every DOM query before any method is called on the result. `borrowBook()` was wrapped in a try-catch block with explicit checks confirming both the member and book exist before any property access. `importLibraryData()` and `loadFromLocalStorage()` were wrapped in try-catch blocks so that malformed JSON or missing localStorage keys fall back gracefully to empty arrays rather than throwing uncaught errors.
 
 ### Variable Declarations and Scope
+
 `books` was changed from an implicit global assignment to `let books = []` and `MAX_BOOKS_PER_MEMBER` was changed to `const MAX_BOOKS_PER_MEMBER = 5`. All `var` declarations throughout both files were migrated to `const` for values that are never reassigned and `let` for values that are, eliminating hoisting surprises and unintended global scope pollution.
 
 ### Comparison Operators
+
 Every instance of `=` used inside a conditional expression was replaced with `===`. This affected `canBorrow()`, `findMemberById()`, `searchBooksByCategory()`, and `handleFilterChange()`. Loose `==` comparisons in `getBooksByAuthor()` were also tightened to `===`. These were among the most dangerous bugs in the codebase because they produced no error — they simply corrupted data or returned wrong results silently.
 
 ### Class Structure
+
 `DigitalBook` was given a correct `super(isbn, title, author, year, copies)` call as the first line of its constructor, before any `this` access, resolving the `ReferenceError`. Constructor parameter ordering was aligned between `Book` and `DigitalBook` so properties are assigned to the correct fields on instantiation. `Book` was updated with `availableCopies` and `totalCopies` properties and `checkOut()` now validates stock before pushing. `Member` was given a `joinDate` property. `PremiumMember` now overrides `canBorrow()` with a higher limit. `searchBooksByCategory()` was given a base case checking whether `index >= bookList.length` before attempting property access. `processReturnQueue()` was given an index increment inside the while loop.
 
 ### UI and Event Handling
+
 Browser `alert()` dialogs were replaced with a centralised `showMessage(message, type)` helper that renders feedback inside `#borrow-feedback` using `.success` and `.error` CSS classes. The `filterDropdown` selector was corrected to `"#filter-category"`. The filter event was changed from `"click"` to `"change"`. A search `"input"` event listener was registered. `renderBookCatalogue` clears the container with `innerHTML = ""` before each render. `handleBorrowSubmit` calls `event.preventDefault()` and resets the form on success. The `"all"` category case was added to `handleFilterChange`.
 
 ### Storage
+
 `saveToLocalStorage` now calls `JSON.stringify` before storing both arrays. `loadFromLocalStorage` now calls `JSON.parse` on retrieval, checks for null before parsing on first load, and falls back to empty arrays if parsing fails.
 
 ### HTML Accessibility
+
 Tab navigation was restructured with `role="tablist"` on a wrapping `<div>`, `role="tab"`, `aria-selected`, `aria-controls`, and `tabindex` on each button, and `role="tabpanel"` with `aria-labelledby` on each section. `<label>` elements were added for all inputs. Inline `style="display:none"` was replaced with a `.hidden` CSS class. Stat card class selectors were converted to IDs. Meta description, `theme-color`, and favicon were added to `<head>`.
 
 ### Testing Improvements
+
 Jest was configured with `jest-environment-jsdom` for DOM testing and Babel for ES module support. Over 117 automated tests were written achieving over 80% code coverage across statements, branches, functions, and lines.
 
 ---
@@ -102,6 +111,7 @@ Jest was configured with `jest-environment-jsdom` for DOM testing and Babel for 
 ## Architecture Improvements
 
 ### Separation of Concerns
+
 The application is split across three modules:
 
 - **library.js** — Business logic, classes, borrowing system, statistics
@@ -177,80 +187,80 @@ Coverage output appears in the terminal. A full HTML report is generated at `./c
 
 ### `Book`
 
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `constructor` | `isbn: string, title: string, author: string, year: number, copies: number` | — | Creates a book with full stock tracking. Sets `totalCopies` and `availableCopies` to `copies`. |
-| `isAvailable()` | — | `boolean` | Returns `true` if `availableCopies > 0`, `false` otherwise. |
-| `checkOut(memberId)` | `memberId: string` | `boolean` | Decrements `availableCopies` and pushes `memberId` to `checkedOut`. Returns `false` if no copies available. |
-| `getInfo()` | — | `string` | Returns a template-literal formatted summary of title, author, ISBN, year, and availability. |
+| Method               | Parameters                                                                  | Returns   | Description                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
+| `constructor`        | `isbn: string, title: string, author: string, year: number, copies: number` | —         | Creates a book with full stock tracking. Sets `totalCopies` and `availableCopies` to `copies`.              |
+| `isAvailable()`      | —                                                                           | `boolean` | Returns `true` if `availableCopies > 0`, `false` otherwise.                                                 |
+| `checkOut(memberId)` | `memberId: string`                                                          | `boolean` | Decrements `availableCopies` and pushes `memberId` to `checkedOut`. Returns `false` if no copies available. |
+| `getInfo()`          | —                                                                           | `string`  | Returns a template-literal formatted summary of title, author, ISBN, year, and availability.                |
 
 ### `DigitalBook`
 
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `constructor` | `isbn: string, title: string, author: string, year: number, fileSize: number, format: string` | — | Calls `super()` then sets `fileSize`, `format`, and `downloads: 0`. |
-| `checkOut(memberId)` | `memberId: string` | `boolean` | Overrides parent — does not decrement stock. Records the member and returns `true`. |
-| `download(memberId)` | `memberId: string` | `void` | Increments `downloads` counter and logs the member ID. |
+| Method               | Parameters                                                                                    | Returns   | Description                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| `constructor`        | `isbn: string, title: string, author: string, year: number, fileSize: number, format: string` | —         | Calls `super()` then sets `fileSize`, `format`, and `downloads: 0`.                 |
+| `checkOut(memberId)` | `memberId: string`                                                                            | `boolean` | Overrides parent — does not decrement stock. Records the member and returns `true`. |
+| `download(memberId)` | `memberId: string`                                                                            | `void`    | Increments `downloads` counter and logs the member ID.                              |
 
 ### `Member`
 
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `constructor` | `id: string, name: string, email: string, membershipType: string` | — | Creates member. Sets `joinDate` to `new Date()` and `borrowedBooks` to `[]`. |
-| `canBorrow()` | — | `boolean` | Returns `true` if `borrowedBooks.length < MAX_BOOKS_PER_MEMBER`. |
-| `getMembershipDuration()` | — | `number` | Returns the number of whole days elapsed since `joinDate`. |
+| Method                    | Parameters                                                        | Returns   | Description                                                                  |
+| ------------------------- | ----------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------- |
+| `constructor`             | `id: string, name: string, email: string, membershipType: string` | —         | Creates member. Sets `joinDate` to `new Date()` and `borrowedBooks` to `[]`. |
+| `canBorrow()`             | —                                                                 | `boolean` | Returns `true` if `borrowedBooks.length < MAX_BOOKS_PER_MEMBER`.             |
+| `getMembershipDuration()` | —                                                                 | `number`  | Returns the number of whole days elapsed since `joinDate`.                   |
 
 ### `PremiumMember`
 
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `constructor` | `id: string, name: string, email: string` | — | Calls `super()` with `membershipType: "premium"`. Initialises `benefits` array. |
-| `canBorrow()` | — | `boolean` | Overrides parent. Allows borrowing up to an elevated limit specific to premium members. |
+| Method        | Parameters                                | Returns   | Description                                                                             |
+| ------------- | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------- |
+| `constructor` | `id: string, name: string, email: string` | —         | Calls `super()` with `membershipType: "premium"`. Initialises `benefits` array.         |
+| `canBorrow()` | —                                         | `boolean` | Overrides parent. Allows borrowing up to an elevated limit specific to premium members. |
 
 ### `LibraryStats`
 
-| Method | Parameters | Returns | Description |
-|--------|-----------|---------|-------------|
-| `updateStats()` | — | `void` | Syncs `totalBooks` and `totalMembers` counts from the live arrays. |
-| `getMostPopularBook()` | — | `Book \| null` | Uses `reduce` to return the book with the highest checkout count. Returns `null` if no books exist. |
+| Method                 | Parameters | Returns        | Description                                                                                         |
+| ---------------------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| `updateStats()`        | —          | `void`         | Syncs `totalBooks` and `totalMembers` counts from the live arrays.                                  |
+| `getMostPopularBook()` | —          | `Book \| null` | Uses `reduce` to return the book with the highest checkout count. Returns `null` if no books exist. |
 
 ### `borrowBook(memberId, isbn)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `memberId` | `string` | ID of the borrowing member |
-| `isbn` | `string` | ISBN of the book to borrow |
-| **Returns** | `{ success: boolean, message: string }` | Object indicating outcome with a human-readable message |
-| **Throws** | `Error` | If member or book is not found after null-checked lookup |
+| Parameter   | Type                                    | Description                                              |
+| ----------- | --------------------------------------- | -------------------------------------------------------- |
+| `memberId`  | `string`                                | ID of the borrowing member                               |
+| `isbn`      | `string`                                | ISBN of the book to borrow                               |
+| **Returns** | `{ success: boolean, message: string }` | Object indicating outcome with a human-readable message  |
+| **Throws**  | `Error`                                 | If member or book is not found after null-checked lookup |
 
 ### `findBookByISBN(isbn)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `isbn` | `string` | ISBN string to look up |
+| Parameter   | Type           | Description                                          |
+| ----------- | -------------- | ---------------------------------------------------- |
+| `isbn`      | `string`       | ISBN string to look up                               |
 | **Returns** | `Book \| null` | The matching `Book` instance, or `null` if not found |
 
 ### `findMemberById(memberId)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `memberId` | `string` | Member ID to look up |
+| Parameter   | Type             | Description                                            |
+| ----------- | ---------------- | ------------------------------------------------------ |
+| `memberId`  | `string`         | Member ID to look up                                   |
 | **Returns** | `Member \| null` | The matching `Member` instance, or `null` if not found |
 
 ### `renderBookCatalogue(bookList)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `bookList` | `Book[]` | Array of `Book` instances to render |
-| **Returns** | `void` | Clears `#catalogue-list` and renders one card per book using a `DocumentFragment` |
+| Parameter   | Type     | Description                                                                       |
+| ----------- | -------- | --------------------------------------------------------------------------------- |
+| `bookList`  | `Book[]` | Array of `Book` instances to render                                               |
+| **Returns** | `void`   | Clears `#catalogue-list` and renders one card per book using a `DocumentFragment` |
 
 ### `showMessage(message, type)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `message` | `string` | Text to display in the feedback region |
-| `type` | `"success" \| "error" \| "info"` | Determines which CSS class is applied to `#borrow-feedback` |
-| **Returns** | `void` | — |
+| Parameter   | Type                             | Description                                                 |
+| ----------- | -------------------------------- | ----------------------------------------------------------- |
+| `message`   | `string`                         | Text to display in the feedback region                      |
+| `type`      | `"success" \| "error" \| "info"` | Determines which CSS class is applied to `#borrow-feedback` |
+| **Returns** | `void`                           | —                                                           |
 
 ### `updateStatisticsDisplay()`
 
@@ -258,13 +268,13 @@ Queries `#total-books`, `#total-members`, and `#books-borrowed` by ID and update
 
 ### `utils.js` — Helper Functions
 
-| Function | Parameters | Returns | Description |
-|----------|-----------|---------|-------------|
-| `formatCurrency(amount)` | `amount: number` | `string` | Returns amount formatted to two decimal places with a currency symbol |
-| `formatDate(date)` | `date: Date` | `string` | Returns a human-readable date string from a `Date` object |
-| `validateISBN(isbn)` | `isbn: string` | `boolean` | Validates ISBN format against a 10 or 13 digit pattern |
-| `validateEmail(email)` | `email: string` | `boolean` | Validates email format using a regex pattern |
-| `debounce(fn, delay)` | `fn: Function, delay: number` | `Function` | Returns a debounced version of `fn` that fires after `delay` ms of inactivity |
+| Function                 | Parameters                    | Returns    | Description                                                                   |
+| ------------------------ | ----------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| `formatCurrency(amount)` | `amount: number`              | `string`   | Returns amount formatted to two decimal places with a currency symbol         |
+| `formatDate(date)`       | `date: Date`                  | `string`   | Returns a human-readable date string from a `Date` object                     |
+| `validateISBN(isbn)`     | `isbn: string`                | `boolean`  | Validates ISBN format against a 10 or 13 digit pattern                        |
+| `validateEmail(email)`   | `email: string`               | `boolean`  | Validates email format using a regex pattern                                  |
+| `debounce(fn, delay)`    | `fn: Function, delay: number` | `Function` | Returns a debounced version of `fn` that fires after `delay` ms of inactivity |
 
 ---
 
@@ -277,9 +287,11 @@ Add the following screenshots to a `screenshots/` folder before submission:
 - `screenshots/jest-passing.png` — Terminal output showing **117 tests passing** across all test suites
 - `screenshots/coverage-report.png` — Coverage report showing **>80%** across statements, branches, functions, and lines
 - `screenshots/search-working.png` — Catalogue filtered in real time by a search term
-- `screenshots/borrow-working.png` — Successful borrow with the `#borrow-feedback` success message displayed
+- `screenshots/borrow-book.png` — Successful borrow book
+- `screenshots/book-borrowed.png` — Successful borrow with the `#borrow-feedback` success message displayed
 - `screenshots/statistics-working.png` — Statistics section showing correct live counts after a borrow transaction
-- `screenshots/member-creation.png` — Member form completed and new member appearing in the member list
+- `screenshots/member-creation.png` — Member form completed
+- `screenshots/member-created.png` — Member form completed and new member appearing in the member list
 - `screenshots/book-details.png` — Book details panel populated after clicking a catalogue card
 
 ---
