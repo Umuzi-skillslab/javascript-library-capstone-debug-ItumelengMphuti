@@ -275,6 +275,77 @@ select:focus{
     gap:1.75rem;
 }
 
+/* View toggle — sits below the grid like a "see more at the desk" note */
+
+#toggle-books{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    margin-top:1.75rem;
+    padding:.75rem 1.5rem;
+    background:transparent;
+    color:var(--green);
+    border:1.5px solid var(--green);
+    border-radius:999px;
+    font-family:var(--font-mono);
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .25s var(--ease);
+}
+
+#toggle-books::before{
+    content:"◆";
+    color:var(--brass);
+    font-size:.6rem;
+    transition:transform .25s var(--ease);
+}
+
+#toggle-books:hover{
+    background:var(--green);
+    color:var(--card);
+    box-shadow:0 8px 18px rgba(30,58,46,.22);
+}
+
+#toggle-books:hover::before{
+    transform:rotate(180deg);
+}
+
+#toggle-books:focus-visible{
+    outline:3px solid var(--brass-light);
+    outline-offset:2px;
+}
+
+/* Drawer-pull toggle — sits above the cards, spans the full grid */
+#toggle-books{
+    grid-column:1 / -1;
+    justify-self:start;
+    background:transparent;
+    color:var(--green);
+    border:1.5px dashed var(--brass);
+    border-radius:var(--radius);
+    padding:.7rem 1.4rem;
+    margin-bottom:.25rem;
+    font-family:var(--font-mono);
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .25s var(--ease);
+}
+
+#toggle-books:hover,
+#toggle-books:focus{
+    background:var(--green);
+    color:var(--card);
+    border-style:solid;
+    border-color:var(--green);
+    box-shadow:0 8px 18px rgba(30,58,46,.2);
+}
+
 .book-card{
     background:var(--card);
     border:1px solid var(--border);

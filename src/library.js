@@ -6,7 +6,7 @@ const MAX_DIGITAL_BOOKS_PER_MEMBER = 5;
 
 // Represents a physical library book and manages borrowing, returning, and reservations.
 class Book {
-  constructor(isbn, title, author, year, copies, category, type) {
+  constructor(isbn, title, author, year, copies, category, type, image) {
     this.isbn = isbn;
     this.title = title;
     this.author = author;
@@ -15,6 +15,7 @@ class Book {
     this.totalCopies = copies;
     this.category = category;
     this.type = type;
+    this.image = image;
     this.checkedOut = [];
     this.reservationQueue = [];
   }
@@ -70,9 +71,9 @@ class Book {
 
 // Extends the Book class to support unlimited digital downloads.
 class DigitalBook extends Book {
-  constructor(isbn, title, author, year, category, fileSize, format) {
+  constructor(isbn, title, author, year, category, fileSize, format, image) {
     // Missing: super() call with correct parameters
-    super(isbn, title, author, year, Infinity, category, "digital");
+    super(isbn, title, author, year, Infinity, category, "digital", image);
     this.fileSize = fileSize;
     this.format = format;
     this.downloads = 0;
@@ -181,7 +182,6 @@ function findOverdueBooks(daysOverdue) {
 
   for (let i = 0; i < books.length; i++) {
     for (let j = 0; j < books[i].checkedOut.length; j++) {
-
       const checkoutRecord = books[i].checkedOut[j];
       const dateCheckedOut = new Date(checkoutRecord.checkoutDate);
       const today = new Date();
@@ -203,7 +203,6 @@ function findOverdueBooks(daysOverdue) {
 
   return overdue;
 }
-
 
 function processReturnQueue(queue) {
   const results = [];
@@ -255,11 +254,9 @@ function calculateTotalLateFees(memberRecord) {
   );
 }
 
-
 function combineBookCollections(fiction, nonFiction, reference) {
   return [...fiction, ...nonFiction, ...reference];
 }
-
 
 function addMultipleBooks(...newBooks) {
   books.push(...newBooks);
@@ -273,7 +270,6 @@ function updateMemberInfo(member, updates) {
   if (typeof updates !== "object" || updates === null) {
     return null;
   }
-
 
   const { name, email, membershipType } = updates;
 
@@ -332,6 +328,13 @@ function borrowBook(memberId, isbn, bookType) {
       return {
         success: false,
         message: `Book with ISBN '${isbn}' was not found.`,
+      };
+    }
+
+    if (member.borrowedBooks.includes(isbn)) {
+      return {
+        success: false,
+        message: "You have already borrowed this book.",
       };
     }
 
@@ -451,14 +454,12 @@ const LibraryStats = {
   totalBorrowings: 0,
 
   updateStats() {
-
     this.totalBooks = books.length;
     this.totalMembers = members.length;
     this.totalBorrowings = books.reduce(
       (total, book) => total + book.checkedOut.length,
       0,
     );
-
   },
 
   getAverageBorrowings() {

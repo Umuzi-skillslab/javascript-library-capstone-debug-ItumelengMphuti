@@ -8,7 +8,7 @@
       "year": 1958,
       "category": "fiction",
       "copies": 4,
-      "image": "../images/to-kill-a-mockingbird.jpg"
+      "image": "../images/things-fall-apart.png"
     },
     {
       "type": "physical",
@@ -17,7 +17,8 @@
       "author": "Chimamanda Ngozi Adichie",
       "year": 2013,
       "category": "fiction",
-      "copies": 3
+      "copies": 3,
+      "image": "../images/americanah.png"
     },
     {
       "type": "physical",
@@ -26,7 +27,8 @@
       "author": "Yuval Noah Harari",
       "year": 2011,
       "category": "non-fiction",
-      "copies": 5
+      "copies": 5,
+      "image": "../images/sapiens-a-brief-history.png"
     },
     {
       "type": "physical",
@@ -35,7 +37,8 @@
       "author": "Nelson Mandela",
       "year": 1994,
       "category": "non-fiction",
-      "copies": 4
+      "copies": 4,
+      "image": "../images/long-walk-to.png"
     },
     {
       "type": "physical",
@@ -44,7 +47,8 @@
       "author": "Chimamanda Ngozi Adichie",
       "year": 2006,
       "category": "fiction",
-      "copies": 3
+      "copies": 3,
+      "image": "../images/half-of-a-yellow.png"
     },
     {
       "type": "physical",
@@ -53,7 +57,9 @@
       "author": "Paulo Coelho",
       "year": 1988,
       "category": "fiction",
-      "copies": 6
+      "copies": 6,
+      "image": "../images/the-alchemist.png"
+
     },
     {
       "type": "physical",
@@ -62,7 +68,8 @@
       "author": "Tara Westover",
       "year": 2018,
       "category": "non-fiction",
-      "copies": 3
+      "copies": 3,
+      "image": "../images/educated.png"
     },
     {
       "type": "physical",
@@ -71,7 +78,8 @@
       "author": "James Clear",
       "year": 2018,
       "category": "non-fiction",
-      "copies": 5
+      "copies": 5,
+      "image": "../images/atomic-habits.png"
     },
     {
       "type": "physical",
@@ -80,7 +88,8 @@
       "author": "Chimamanda Ngozi Adichie",
       "year": 2003,
       "category": "fiction",
-      "copies": 2
+      "copies": 2,
+      "image": "../images/purple-hibiscus.png"
     },
     {
       "type": "physical",
@@ -89,7 +98,8 @@
       "author": "Thomas H. Cormen",
       "year": 2009,
       "category": "reference",
-      "copies": 3
+      "copies": 3,
+      "image": "../images/Introduction-to-Algorithms.jpg"
     },
     {
       "type": "physical",
@@ -98,7 +108,8 @@
       "author": "Khaled Hosseini",
       "year": 2003,
       "category": "fiction",
-      "copies": 4
+      "copies": 4,
+      "image": "../images/the-kite-runner.png"
     },
     {
       "type": "physical",
@@ -107,7 +118,8 @@
       "author": "Daniel Kahneman",
       "year": 2011,
       "category": "non-fiction",
-      "copies": 3
+      "copies": 3,
+      "image": "../images/thinking-fast-and-slow.png"
     },
     {
       "type": "physical",
@@ -116,7 +128,8 @@
       "author": "Robert C. Martin",
       "year": 2008,
       "category": "reference",
-      "copies": 4
+      "copies": 4,
+      "image": "../images/clean-code.png"
     },
     {
       "type": "physical",
@@ -125,7 +138,8 @@
       "author": "Ngũgĩ wa Thiong'o",
       "year": 1967,
       "category": "Fiction",
-      "copies": 2
+      "copies": 2,
+      "image": "../images/a-grain-of-wheat.png"
     },
     {
       "type": "physical",
@@ -134,7 +148,8 @@
       "author": "Andrew Butterfield",
       "year": 2016,
       "category": "Reference",
-      "copies": 2
+      "copies": 2,
+      "image": "../images/The-Oxford-Dictionary-of-Computing.png"
     },
     {
       "type": "digital",
@@ -145,7 +160,8 @@
       "category": "non-fiction",
       "copies": 4,
       "fileSize": "8 MB",
-      "format": "PDF"
+      "format": "PDF",
+      "image": "../images/becoming.png"
     },
     {
       "type": "digital",
@@ -156,7 +172,8 @@
       "category": "fiction",
       "copies": 3,
       "fileSize": "7 MB",
-      "format": "PDF"
+      "format": "PDF",
+      "image": "../images/the-silent-patient.png"
     },
     {
       "type": "digital",
@@ -167,7 +184,8 @@
       "category": "reference",
       "copies": 4,
       "fileSize": "12 MB",
-      "format": "PDF"
+      "format": "PDF",
+      "image": "../images/The-Pragmatic-Programmer.png"
     },
     {
       "type": "digital",
@@ -178,7 +196,8 @@
       "category": "fiction",
       "copies": 5,
       "fileSize": "10 MB",
-      "format": "PDF"
+      "format": "PDF",
+      "image": "../images/the-midnight-library.png"
     },
     {
       "type": "digital",
@@ -189,7 +208,8 @@
       "category": "reference",
       "copies": 3,
       "fileSize": "8 MB",
-      "format": "PDF"
+      "format": "PDF",
+      "image": "../images/Javascript-The-Definitive-Guide.png"
     }
   ]
 }

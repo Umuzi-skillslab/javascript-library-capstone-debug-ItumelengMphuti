@@ -14,6 +14,8 @@ import {
 
 import { showMessage } from "./utils.js";
 
+let showingAllBooks = false;
+
 // Initializes the application once the page has fully loaded.
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", initializeUI);
@@ -34,15 +36,34 @@ function initializeUI() {
   }
 
   setupEventListeners();
-  loadCatalogue();
   createMemberForm();
-  renderMemberList();
+
+  if (localStorage.getItem("libraryBooks")) {
+    loadFromLocalStorage();
+    renderMemberList();
+  } else {
+    loadCatalogue();
+  }
 }
 
 // Registers all user interactions such as searching, borrowing, and returning books.
 function setupEventListeners() {
   searchInput.addEventListener("input", handleSearch);
   filterDropdown.addEventListener("change", handleFilterChange);
+
+  const toggleButton = document.getElementById("toggle-books");
+
+  if (toggleButton) {
+    toggleButton.addEventListener("click", () => {
+      showingAllBooks = !showingAllBooks;
+
+      toggleButton.textContent = showingAllBooks
+        ? "Show Less"
+        : "View All Books";
+
+      renderBookCatalogue(books);
+    });
+  }
 
   const borrowForm = document.getElementById("borrow-form");
 
@@ -133,6 +154,7 @@ async function loadCatalogue() {
             book.category,
             book.fileSize,
             book.format,
+            book.image,
           ),
         );
       } else {
@@ -145,6 +167,7 @@ async function loadCatalogue() {
             book.copies,
             book.category,
             book.type,
+            book.image,
           ),
         );
       }
@@ -168,13 +191,19 @@ function renderBookCatalogue(bookList) {
   container.innerHTML = "";
 
   const fragment = document.createDocumentFragment();
+  const booksToDisplay = showingAllBooks ? bookList : bookList.slice(0, 4);
 
-  for (const book of bookList) {
+  for (const book of booksToDisplay) {
     const bookCard = document.createElement("div");
     bookCard.className = "book-card";
     bookCard.dataset.isbn = book.isbn;
 
     bookCard.innerHTML = `
+        <img
+        src="${book.image}"
+        alt="${book.title} cover"
+        class="book-cover"
+        >
         <h3>${book.title}</h3>
         <p><strong>Author:</strong> ${book.author}</p>
         <p><strong>Type:</strong> ${book.type.charAt(0).toUpperCase() + book.type.slice(1)}</p>
@@ -185,6 +214,12 @@ function renderBookCatalogue(bookList) {
         `;
 
     fragment.appendChild(bookCard);
+  }
+
+  const toggleButton = document.getElementById("toggle-books");
+
+  if (toggleButton) {
+    toggleButton.style.display = bookList.length > 4 ? "block" : "none";
   }
 
   container.appendChild(fragment);
@@ -206,6 +241,7 @@ function handleBorrowSubmit(event) {
   );
 
   if (result.success) {
+    saveToLocalStorage();
     event.target.reset();
     renderBookCatalogue(books);
     displayBookDetails(isbn);
@@ -239,6 +275,7 @@ function handleReturnSubmit(event) {
   );
 
   if (result.success) {
+    saveToLocalStorage();
     event.target.reset();
 
     renderBookCatalogue(books);
@@ -312,6 +349,8 @@ function importLibraryData(jsonString) {
     books.push(...data.books);
     members.push(...data.members);
 
+    saveToLocalStorage();
+
     renderBookCatalogue(books);
     updateStatisticsDisplay();
   } catch (error) {
@@ -342,10 +381,74 @@ function loadFromLocalStorage() {
     books.length = 0;
     members.length = 0;
 
-    books.push(...JSON.parse(booksData));
-    members.push(...JSON.parse(membersData));
+    // Restore books
+    const storedBooks = JSON.parse(booksData);
+
+    storedBooks.forEach((book) => {
+      let restoredBook;
+
+      if (book.type === "digital") {
+        restoredBook = new DigitalBook(
+          book.isbn,
+          book.title,
+          book.author,
+          book.year,
+          book.category,
+          book.fileSize,
+          book.format,
+          book.image,
+        );
+      } else {
+        restoredBook = new Book(
+          book.isbn,
+          book.title,
+          book.author,
+          book.year,
+          book.totalCopies,
+          book.category,
+          book.type,
+          book.image,
+        );
+
+        restoredBook.availableCopies = book.availableCopies;
+        restoredBook.checkedOut = book.checkedOut || [];
+        restoredBook.reservationQueue = book.reservationQueue || [];
+      }
+
+      books.push(restoredBook);
+    });
+
+    // Restore members
+    const storedMembers = JSON.parse(membersData);
+
+    storedMembers.forEach((member) => {
+      let restoredMember;
+
+      if (member.membershipType === "premium") {
+        restoredMember = new PremiumMember(
+          member.id,
+          member.name,
+          member.email,
+          member.joinDate,
+        );
+      } else {
+        restoredMember = new Member(
+          member.id,
+          member.name,
+          member.email,
+          member.membershipType,
+          member.joinDate,
+        );
+      }
+
+      restoredMember.borrowedBooks = member.borrowedBooks || [];
+      restoredMember.downloadedBooks = member.downloadedBooks || [];
+
+      members.push(restoredMember);
+    });
 
     renderBookCatalogue(books);
+    renderMemberList();
     updateStatisticsDisplay();
   } catch (error) {
     console.error("Failed to load:", error);
@@ -370,6 +473,11 @@ function displayBookDetails(isbn) {
 
   detailsContainer.innerHTML = `
         <div class="book-details">
+            <img
+            src="${book.image}"
+            alt="${book.title} cover"
+            class="book-cover"
+        >
             <h2>${book.title}</h2>
             <p><strong>Author:</strong> ${book.author}</p>
             <p><strong>ISBN:</strong> ${book.isbn}</p>
@@ -462,10 +570,37 @@ function createMemberForm() {
             <option value="premium">Premium</option>
         </select>
 
+        <div id="membership-benefits" class="membership-benefits"></div>
         <button type="submit">Add Member</button>
     `;
 
   formContainer.appendChild(form);
+
+  const membershipSelect = document.getElementById("membership-type");
+  const benefits = document.getElementById("membership-benefits");
+
+  function updateMembershipBenefits() {
+    if (membershipSelect.value === "premium") {
+      benefits.innerHTML = `
+      <strong>Premium Benefits</strong>
+      <ul>
+        <li>Borrow up to 10 books at a time.</li>
+        <li>Access unlimited digital books.</li>
+        <li>Priority reservations for popular titles.</li>
+      </ul>
+    `;
+    } else {
+      benefits.innerHTML = `
+      <strong>Standard Benefits</strong>
+      <ul>
+        <li>Borrow up to 5 books at a time.</li>
+      </ul>
+    `;
+    }
+  }
+
+  membershipSelect.addEventListener("change", updateMembershipBenefits);
+  updateMembershipBenefits();
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -495,6 +630,8 @@ function createMemberForm() {
 
     members.push(member);
 
+    saveToLocalStorage();
+
     renderMemberList();
 
     updateStatisticsDisplay();
@@ -509,6 +646,7 @@ function createMemberForm() {
     );
 
     form.reset();
+    updateMembershipBenefits();
   });
 }
 
