@@ -13,6 +13,7 @@ This is the starter codebase for your digital library management system. The cod
 ## System Overview
 
 The library system manages:
+
 - Physical and digital books with ISBN tracking
 - Member accounts (standard and premium)
 - Book borrowing and returns
@@ -24,6 +25,7 @@ The library system manages:
 The starter code contains complex, intentional errors across all JavaScript topics:
 
 **Fundamentals:**
+
 - Variable scoping issues (var, let, const confusion)
 - Missing variable declarations
 - Incorrect operators (=, ==, ===)
@@ -31,6 +33,7 @@ The starter code contains complex, intentional errors across all JavaScript topi
 - Null/undefined/empty value handling gaps
 
 **Control Flow:**
+
 - Off-by-one errors in loops
 - Infinite while loops (missing increments)
 - Missing for-of loop implementations
@@ -38,6 +41,7 @@ The starter code contains complex, intentional errors across all JavaScript topi
 - Broken conditional logic
 
 **Functions & OOP:**
+
 - Missing function parameters
 - Broken recursive functions (no base cases)
 - Class inheritance errors (missing super())
@@ -45,6 +49,7 @@ The starter code contains complex, intentional errors across all JavaScript topi
 - Object literal improvements needed
 
 **Modern JavaScript:**
+
 - No destructuring implementations
 - Missing template literals
 - No spread/rest operators used
@@ -52,6 +57,7 @@ The starter code contains complex, intentional errors across all JavaScript topi
 - Outdated string concatenation
 
 **DOM & Storage:**
+
 - Incorrect DOM selectors
 - Missing event handlers and delegation
 - No JSON operations implemented
@@ -59,6 +65,7 @@ The starter code contains complex, intentional errors across all JavaScript topi
 - Poor error handling throughout
 
 **Testing:**
+
 - Highly incomplete test coverage
 - Missing edge case tests
 - No test setup/teardown
@@ -95,6 +102,7 @@ npm run test:coverage # Generate coverage report
 ## Complexity Notes
 
 This project is more challenging than a basic application:
+
 - Multiple interrelated classes with inheritance
 - Complex data relationships (books ↔ members)
 - Nested data structures requiring careful manipulation

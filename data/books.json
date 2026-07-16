@@ -1,0 +1,214 @@
+{
+  "books": [
+    {
+      "type": "physical",
+      "isbn": "978-0-7432-7356-5",
+      "title": "Things Fall Apart",
+      "author": "Chinua Achebe",
+      "year": 1958,
+      "category": "fiction",
+      "copies": 4,
+      "image": "../images/things-fall-apart.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-7432-7357-2",
+      "title": "Americanah",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2013,
+      "category": "fiction",
+      "copies": 3,
+      "image": "../images/americanah.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-3856-6052-4",
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "year": 2011,
+      "category": "non-fiction",
+      "copies": 5,
+      "image": "../images/sapiens-a-brief-history.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-5957-4066-3",
+      "title": "Long Walk to Freedom",
+      "author": "Nelson Mandela",
+      "year": 1994,
+      "category": "non-fiction",
+      "copies": 4,
+      "image": "../images/long-walk-to.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-1403-2349-8",
+      "title": "Half of a Yellow Sun",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2006,
+      "category": "fiction",
+      "copies": 3,
+      "image": "../images/half-of-a-yellow.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-6709-1068-9",
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "year": 1988,
+      "category": "fiction",
+      "copies": 6,
+      "image": "../images/the-alchemist.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-1410-3943-3",
+      "title": "Educated",
+      "author": "Tara Westover",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 3,
+      "image": "../images/educated.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-3853-3348-1",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 5,
+      "image": "../images/atomic-habits.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-1412-8028-3",
+      "title": "Purple Hibiscus",
+      "author": "Chimamanda Ngozi Adichie",
+      "year": 2003,
+      "category": "fiction",
+      "copies": 2,
+      "image": "../images/purple-hibiscus.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-1930-3943-1",
+      "title": "Introduction to Algorithms",
+      "author": "Thomas H. Cormen",
+      "year": 2009,
+      "category": "reference",
+      "copies": 3,
+      "image": "../images/Introduction-to-Algorithms.jpg"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-5960-0916-2",
+      "title": "The Kite Runner",
+      "author": "Khaled Hosseini",
+      "year": 2003,
+      "category": "fiction",
+      "copies": 4,
+      "image": "../images/the-kite-runner.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-3854-7378-4",
+      "title": "Thinking, Fast and Slow",
+      "author": "Daniel Kahneman",
+      "year": 2011,
+      "category": "non-fiction",
+      "copies": 3,
+      "image": "../images/thinking-fast-and-slow.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-1960-3943-7",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "year": 2008,
+      "category": "reference",
+      "copies": 4,
+      "image": "../images/clean-code.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-7432-7358-9",
+      "title": "A Grain of Wheat",
+      "author": "Ngũgĩ wa Thiong'o",
+      "year": 1967,
+      "category": "Fiction",
+      "copies": 2,
+      "image": "../images/a-grain-of-wheat.png"
+    },
+    {
+      "type": "physical",
+      "isbn": "978-0-2460-3943-5",
+      "title": "The Oxford Dictionary of Computing",
+      "author": "Andrew Butterfield",
+      "year": 2016,
+      "category": "Reference",
+      "copies": 2,
+      "image": "../images/The-Oxford-Dictionary-of-Computing.png"
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-3072-7748-3",
+      "title": "Becoming",
+      "author": "Michelle Obama",
+      "year": 2018,
+      "category": "non-fiction",
+      "copies": 4,
+      "fileSize": "8 MB",
+      "format": "PDF",
+      "image": "../images/becoming.png"
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-5533-8079-9",
+      "title": "The Silent Patient",
+      "author": "Alex Michaelides",
+      "year": 2019,
+      "category": "fiction",
+      "copies": 3,
+      "fileSize": "7 MB",
+      "format": "PDF",
+      "image": "../images/the-silent-patient.png"
+    },
+    {
+      "type": "digital",
+      "isbn": "978-0-3215-6358-5",
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt",
+      "year": 1999,
+      "category": "reference",
+      "copies": 4,
+      "fileSize": "12 MB",
+      "format": "PDF",
+      "image": "../images/The-Pragmatic-Programmer.png"
+    },
+    {
+      "type": "digital",
+      "isbn": "978-1-2503-0817-1",
+      "title": "The Midnight Library",
+      "author": "Matt Haig",
+      "year": 2020,
+      "category": "fiction",
+      "copies": 5,
+      "fileSize": "10 MB",
+      "format": "PDF",
+      "image": "../images/the-midnight-library.png"
+    },
+    {
+      "type": "digital",
+      "isbn": "978-1-4919-1889-0",
+      "title": "JavaScript: The Definitive Guide",
+      "author": "David Flanagan",
+      "year": 2020,
+      "category": "reference",
+      "copies": 3,
+      "fileSize": "8 MB",
+      "format": "PDF",
+      "image": "../images/Javascript-The-Definitive-Guide.png"
+    }
+  ]
+}
