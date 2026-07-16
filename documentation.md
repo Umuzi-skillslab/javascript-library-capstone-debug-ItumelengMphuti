@@ -17,33 +17,33 @@ The application supports both **physical books** and **digital books**, member m
 
 The following bugs were identified and corrected during development.
 
-| #   | File       | Error                                                                                                                         | Severity |
-| --- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- | -------- |
+| #   | File       | Error                                                                                                                        | Severity |
+| --- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- |
 | 1   | ui.js      | `initializeUI()` called as a bare function call before the DOM has finished parsing, every `querySelector` returns null      | High     |
 | 2   | ui.js      | No null checks after any DOM query: any missing element causes an immediate `TypeError` that breaks the entire UI            | High     |
 | 3   | library.js | `books = []` assigned without a declaration keyword: creates an implicit global and throws a `ReferenceError` in strict mode | High     |
-| 4   | library.js | `MAX_BOOKS_PER_MEMBER = 5` assigned without `const` - implicit global, not enforced as a constant                             | High     |
-| 5   | library.js | `DigitalBook` constructor accesses `this.fileSize` before calling `super()` - throws `ReferenceError` at runtime              | High     |
-| 6   | library.js | Constructor parameter order mismatch between `Book` and `DigitalBook` - properties assigned to wrong fields on instantiation  | High     |
-| 7   | library.js | `canBorrow()` uses assignment `=` instead of `===` - condition always evaluates as truthy, borrow limit never enforced        | High     |
-| 8   | library.js | `findMemberById()` uses `=` instead of `===` - always returns the first member regardless of ID passed                        | High     |
-| 9   | library.js | `searchBooksByCategory()` uses `=` instead of `===` - overwrites every book's category property on each call                  | High     |
-| 10  | library.js | `searchBooksByCategory()` has no base case - recursive function always causes a stack overflow                                | High     |
-| 11  | library.js | `processReturnQueue()` never increments the loop index - infinite loop that hangs the browser tab                             | High     |
-| 12  | library.js | `borrowBook()` calls `member.canBorrow()` with no null guard - crashes with `TypeError` when member or book is not found      | High     |
-| 13  | ui.js      | `filterDropdown` selector written as `"filter-category"` without `#` - targets a non-existent HTML element, returns null      | High     |
-| 14  | ui.js      | `handleBorrowSubmit` missing `event.preventDefault()` - form submission triggers a full page reload, wiping all state         | High     |
-| 15  | ui.js      | `saveToLocalStorage` missing `JSON.stringify` - arrays stored as `[object Object]`, unreadable on retrieval                   | High     |
-| 16  | ui.js      | `loadFromLocalStorage` missing `JSON.parse` - raw strings assigned to `books` and `members`, breaking all array operations    | High     |
-| 17  | ui.js      | `importLibraryData` has no try-catch around `JSON.parse` - any malformed input throws an uncaught `SyntaxError`               | High     |
-| 18  | ui.js      | `renderBookCatalogue` never clears the container before rendering - repeated calls stack results on top of each other         | Medium   |
-| 19  | ui.js      | `filterDropdown` uses `"click"` event instead of `"change"` - filter handler fires on focus, not on selection                 | Medium   |
-| 20  | ui.js      | Search input has no registered event listener - the search field has no effect on the catalogue                               | Medium   |
-| 21  | ui.js      | `displayBookDetails` has no null check after `findBookByISBN` - crashes when an unrecognised ISBN is passed                   | Medium   |
-| 22  | ui.js      | `updateStatisticsDisplay` targets elements by class instead of ID - selects wrong elements once IDs are corrected in HTML     | Medium   |
-| 23  | ui.js      | `handleFilterChange` does not handle the `"all"` option - selecting All Categories returns an empty list                      | Low      |
-| 24  | html       | Tab navigation buttons have no ARIA roles - screen readers cannot identify or operate the tab pattern                         | High     |
-| 25  | html       | All form inputs missing `<label>` elements - fails WCAG 1.3.1 and 3.3.2, placeholder text is not a label substitute           | High     |
+| 4   | library.js | `MAX_BOOKS_PER_MEMBER = 5` assigned without `const` - implicit global, not enforced as a constant                            | High     |
+| 5   | library.js | `DigitalBook` constructor accesses `this.fileSize` before calling `super()` - throws `ReferenceError` at runtime             | High     |
+| 6   | library.js | Constructor parameter order mismatch between `Book` and `DigitalBook` - properties assigned to wrong fields on instantiation | High     |
+| 7   | library.js | `canBorrow()` uses assignment `=` instead of `===` - condition always evaluates as truthy, borrow limit never enforced       | High     |
+| 8   | library.js | `findMemberById()` uses `=` instead of `===` - always returns the first member regardless of ID passed                       | High     |
+| 9   | library.js | `searchBooksByCategory()` uses `=` instead of `===` - overwrites every book's category property on each call                 | High     |
+| 10  | library.js | `searchBooksByCategory()` has no base case - recursive function always causes a stack overflow                               | High     |
+| 11  | library.js | `processReturnQueue()` never increments the loop index - infinite loop that hangs the browser tab                            | High     |
+| 12  | library.js | `borrowBook()` calls `member.canBorrow()` with no null guard - crashes with `TypeError` when member or book is not found     | High     |
+| 13  | ui.js      | `filterDropdown` selector written as `"filter-category"` without `#` - targets a non-existent HTML element, returns null     | High     |
+| 14  | ui.js      | `handleBorrowSubmit` missing `event.preventDefault()` - form submission triggers a full page reload, wiping all state        | High     |
+| 15  | ui.js      | `saveToLocalStorage` missing `JSON.stringify` - arrays stored as `[object Object]`, unreadable on retrieval                  | High     |
+| 16  | ui.js      | `loadFromLocalStorage` missing `JSON.parse` - raw strings assigned to `books` and `members`, breaking all array operations   | High     |
+| 17  | ui.js      | `importLibraryData` has no try-catch around `JSON.parse` - any malformed input throws an uncaught `SyntaxError`              | High     |
+| 18  | ui.js      | `renderBookCatalogue` never clears the container before rendering - repeated calls stack results on top of each other        | Medium   |
+| 19  | ui.js      | `filterDropdown` uses `"click"` event instead of `"change"` - filter handler fires on focus, not on selection                | Medium   |
+| 20  | ui.js      | Search input has no registered event listener - the search field has no effect on the catalogue                              | Medium   |
+| 21  | ui.js      | `displayBookDetails` has no null check after `findBookByISBN` - crashes when an unrecognised ISBN is passed                  | Medium   |
+| 22  | ui.js      | `updateStatisticsDisplay` targets elements by class instead of ID - selects wrong elements once IDs are corrected in HTML    | Medium   |
+| 23  | ui.js      | `handleFilterChange` does not handle the `"all"` option - selecting All Categories returns an empty list                     | Low      |
+| 24  | html       | Tab navigation buttons have no ARIA roles - screen readers cannot identify or operate the tab pattern                        | High     |
+| 25  | html       | All form inputs missing `<label>` elements - fails WCAG 1.3.1 and 3.3.2, placeholder text is not a label substitute          | High     |
 
 ---
 
@@ -190,7 +190,7 @@ Coverage output appears in the terminal. A full HTML report is generated at `./c
 | Method               | Parameters                                                                  | Returns   | Description                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
 | `constructor`        | `isbn: string, title: string, author: string, year: number, copies: number` | -         | Creates a book with full stock tracking. Sets `totalCopies` and `availableCopies` to `copies`.              |
-| `isAvailable()`      | -                                                                          | `boolean` | Returns `true` if `availableCopies > 0`, `false` otherwise.                                                 |
+| `isAvailable()`      | -                                                                           | `boolean` | Returns `true` if `availableCopies > 0`, `false` otherwise.                                                 |
 | `checkOut(memberId)` | `memberId: string`                                                          | `boolean` | Decrements `availableCopies` and pushes `memberId` to `checkedOut`. Returns `false` if no copies available. |
 | `getInfo()`          | -                                                                           | `string`  | Returns a template-literal formatted summary of title, author, ISBN, year, and availability.                |
 
